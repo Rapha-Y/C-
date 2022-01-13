@@ -2,6 +2,12 @@
 
 %}
 
+letter      [a-zA-Z]
+digit       [0-9]
+
+ID          {letter}+
+NUM         {digit}+
+
 %%
 
 "else"      { return ELSE; }
