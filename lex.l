@@ -38,6 +38,13 @@ NUM         {digit}+
 "/*"        { return LCOMM; }
 "*/"        { return RCOMM; }
 
+ID          { return ID; }
+NUM         { return NUM; }
+
+" "         ;
+"\t"        ;
+"\n"        ;
+
 %%
 
 main() {
