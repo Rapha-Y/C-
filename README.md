@@ -2,6 +2,6 @@
 
 flex lexer.l
 
-gcc lex.yy.c -o lexer
+gcc -o steemit lex.yy.c
 
-./lexer example.c
+./steemit example.c

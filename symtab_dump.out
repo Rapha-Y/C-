@@ -1,0 +1,9 @@
+------------ ------ ------------
+Name         Type   Line Numbers
+------------ ------ -------------
+i            undef     4    8    8    8    9    9   10   11   17   23   23 
+val          undef     5    9   10 
+value        undef    17   23 
+res          undef     5    9   10   11   20   23   25 
+operation    undef     9   17 
+print        undef    11   12 
