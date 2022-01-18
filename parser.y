@@ -10,11 +10,24 @@
 	void yyerror();
 %}
 
+/* YYSTYPE union */
+%union {
+	char char_val;
+	int int_val;
+	double double_val;
+	char* str_val;
+	list_t* symtab_item;
+}
+
 /* token definition */
-%token CHAR INT FLOAT DOUBLE IF ELSE WHILE FOR CONTINUE BREAK VOID RETURN
-%token ADDOP MULOP DIVOP INCR OROP ANDOP NOTOP EQUOP RELOP
-%token LPAREN RPAREN LBRACK RBRACK LBRACE RBRACE SEMI DOT COMMA ASSIGN REFER
-%token ID ICONST FCONST CCONST STRING
+%token<int_val> CHAR INT FLOAT DOUBLE IF ELSE WHILE FOR CONTINUE BREAK VOID RETURN
+%token<int_val> ADDOP MULOP DIVOP INCR OROP ANDOP NOTOP EQUOP RELOP
+%token<int_val> LPAREN RPAREN LBRACK RBRACK LBRACE RBRACE SEMI DOT COMMA ASSIGN REFER
+%token<symtab_item> ID 
+%token<int_val> ICONST 
+%token<double_val> FCONST 
+%token<char_val> CCONST 
+%token<str_val> STRING
 
 %start program
  
@@ -81,7 +94,7 @@ expression:
 
 sign: ADDOP | /* empty */ ; 
  
-constant: ICONST | FCONST | CCONST ;
+constant: ICONST | FCONS | CCONST ;
  
 assigment: reference variable ASSIGN expression SEMI ; 
  

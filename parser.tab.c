@@ -168,7 +168,20 @@ extern int yydebug;
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef int YYSTYPE;
+union YYSTYPE
+{
+#line 14 "parser.y"
+
+	char char_val;
+	int int_val;
+	double double_val;
+	char* str_val;
+	list_t* symtab_item;
+
+#line 182 "parser.tab.c"
+
+};
+typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif
@@ -544,12 +557,12 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    25,    25,    27,    27,    29,    31,    31,    31,    31,
-      31,    33,    33,    35,    36,    37,    40,    40,    42,    42,
-      44,    44,    47,    47,    47,    47,    48,    48,    48,    51,
-      54,    55,    55,    58,    58,    60,    62,    64,    64,    67,
-      68,    69,    70,    71,    72,    73,    74,    75,    76,    77,
-      78,    79,    82,    82,    84,    84,    84,    86,    88,    88
+       0,    38,    38,    40,    40,    42,    44,    44,    44,    44,
+      44,    46,    46,    48,    49,    50,    53,    53,    55,    55,
+      57,    57,    60,    60,    60,    60,    61,    61,    61,    64,
+      67,    68,    68,    71,    71,    73,    75,    77,    77,    80,
+      81,    82,    83,    84,    85,    86,    87,    88,    89,    90,
+      91,    92,    95,    95,    97,    97,    97,    99,   101,   101
 };
 #endif
 
@@ -1439,8 +1452,26 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
+  case 13:
+#line 48 "parser.y"
+             {printf("ID: %s\n", yylval.symtab_item->st_name);}
+#line 1459 "parser.tab.c"
+    break;
 
-#line 1444 "parser.tab.c"
+  case 54:
+#line 97 "parser.y"
+                 {printf("%d\n", yylval.int_val);}
+#line 1465 "parser.tab.c"
+    break;
+
+  case 55:
+#line 97 "parser.y"
+                                                            {printf("%.2f\n", yyval.double_val);}
+#line 1471 "parser.tab.c"
+    break;
+
+
+#line 1475 "parser.tab.c"
 
       default: break;
     }
@@ -1672,7 +1703,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 90 "parser.y"
+#line 103 "parser.y"
 
 
 void yyerror ()
