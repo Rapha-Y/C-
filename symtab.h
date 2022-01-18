@@ -40,7 +40,7 @@ void init_hash_table(); // initialize hash table
 unsigned int hash(char *key); // has function
 void insert(char *name, int len, int type, int lineno); // insert entry
 list_t *lookup(char *name); // search for entry
-list_t *lookup_scope(char *name); // search for entry in scope
+list_t *lookup_scope(char *name, int scope); // search for entry in scope
 void hide(); // hide the current scope
-void hide_scope(int scope); // hide a specific scope
+void hide_scope(); // hide a specific scope
 void symtab_dump(FILE *of); //dump file 
