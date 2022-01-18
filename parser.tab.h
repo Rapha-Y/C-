@@ -95,7 +95,7 @@ union YYSTYPE
 {
 #line 14 "parser.y"
 
-	char char_val;
+    char char_val;
 	int int_val;
 	double double_val;
 	char* str_val;

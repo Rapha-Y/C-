@@ -368,7 +368,7 @@ static const flex_int16_t yy_accept[151] =
         0,    0,    0,    0,   48,   46,   45,   44,   25,   46,
        38,   46,   28,   29,   20,   19,   36,   19,   35,   21,
        40,   40,   34,   27,   37,   27,   39,   39,   39,   39,
-       39,   39,   39,   39,   39,   39,   30,   31,   39,   39,
+       39,   39,   39,   39,   39,   39,   31,   30,   39,   39,
        39,   39,   39,   39,   39,   39,   39,   32,   46,   33,
         4,    6,    5,   45,   26,    0,   43,   24,    0,    0,
        22,   41,    2,    1,    0,   40,   27,   39,   39,   39,
@@ -1050,12 +1050,12 @@ YY_RULE_SETUP
 case 30:
 YY_RULE_SETUP
 #line 68 "lexer.l"
-{ return LBRACK; }
+{ return RBRACK; }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
 #line 69 "lexer.l"
-{ return RBRACK; }
+{ return LBRACK; }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
@@ -1096,16 +1096,16 @@ case 39:
 YY_RULE_SETUP
 #line 79 "lexer.l"
 {
-					// insert identifier into symbol table
-					insert(yytext, strlen(yytext), UNDEF, lineno);
-					yylval.symtab_item = lookup(yytext);
-					return ID;
-				}
+        // insert identifier into symbol table
+        insert(yytext, strlen(yytext), UNDEF, lineno);
+        yylval.symtab_item = lookup(yytext);
+        return ID;
+        }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
 #line 85 "lexer.l"
-{ yylval.int_val = atoi(yytext); return ICONST; }
+{ yylval.int_val   = atoi(yytext); return ICONST; }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
@@ -1115,35 +1115,36 @@ YY_RULE_SETUP
 case 42:
 YY_RULE_SETUP
 #line 87 "lexer.l"
-{ yylval.char_val = yytext[0]; return CCONST; }
+{ yylval.char_val  = yytext[0];    return CCONST; }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
 #line 88 "lexer.l"
-{ yylval.str_val = malloc(yyleng*sizeof(char)); strcpy(yylval.str_val, yytext); return STRING; }
+{ yylval.str_val = malloc(yyleng * sizeof(char));
+              strcpy(yylval.str_val, yytext);  return STRING; }
 	YY_BREAK
 case 44:
 /* rule 44 can match eol */
 YY_RULE_SETUP
-#line 91 "lexer.l"
+#line 92 "lexer.l"
 { lineno += 1; }
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 92 "lexer.l"
+#line 93 "lexer.l"
 /* eat up whitespace */
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 94 "lexer.l"
+#line 95 "lexer.l"
 { yyerror("Unrecognized character"); }
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 96 "lexer.l"
+#line 97 "lexer.l"
 ECHO;
 	YY_BREAK
-#line 1147 "lex.yy.c"
+#line 1148 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(ML_COMMENT):
 	yyterminate();
@@ -2149,5 +2150,5 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 96 "lexer.l"
+#line 97 "lexer.l"
 
