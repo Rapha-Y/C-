@@ -1,14 +1,19 @@
 // program: declarations statements RETURN SEMI functions
 // main function (declarations statements)
+
 // declarations
 int i;                    // simple variable
 char c = 'c';             // one with init
 double val = 2.5, res[6]; // two variables, one with init and one array
-double *p;                // pointer variable				  
+double *p;                // pointer variable
+				  
 // statements
 p = &res; // assigment
-for(i = 0; i < 10; i++){ // for
-	if(i > 5){ // if-else
+
+// for
+for(i = 0; i < 10; i++){
+    // if-elseif-else
+	if(i > 5){ 
     	break;
 	}
 	else if(i == 5){
@@ -21,39 +26,50 @@ for(i = 0; i < 10; i++){ // for
 	}
 	else{
 		*p = add(val, i);
-    	        val = res[i];
+    	val = res[i];
    	 	print(res[i]);
-    	        print("\n");
-    	        p = p + 1;
+    	print("\n");
+    	p = p + 1;
 	}
-	
-	if(i == 2 && val == 4.5){ // if
+
+	// if only
+	if(i == 2 && val == 4.5){
 		print("iteration: 3\n");
 	}
 }
-while(i < 12){ // while
+
+// while
+while(i < 12){
 	print(i);
 	print(" ");
 	func2(c);
 	i++;
 }
+
 print("\n");
-return; /* RETURN SEMI */
+
+/* RETURN SEMI */
+return; 
+
 // other functions (functions)
-int func1(){ 		/* without parameters */
+int func1(){ /* without parameters */
 	// statements
 	return 5;
 }
+
 void func2(char c){ /* with one parameter */
 	// declarations
 	char *s;
+
 	// statements
 	*s = c;
 	print(*s);
 }
+
 double add (double a, int b){  /* with two parameters */
     // declarations
     double res;
+
     // statements
     res = a + b;
     return res;

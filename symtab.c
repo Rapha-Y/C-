@@ -5,6 +5,7 @@
 
 /* current scope */
 int cur_scope = 0;
+int declare = 0; // 1: declaring, 0: not
 
 void init_hash_table(){
 	int i; 
@@ -27,28 +28,58 @@ void insert(char *name, int len, int type, int lineno){
 	
 	/* variable not yet in table */
 	if (l == NULL){
+		/* set up entry */
 		l = (list_t*) malloc(sizeof(list_t));
 		strncpy(l->st_name, name, len);  
-		/* add to hashtable */
 		l->st_type = type;
 		l->scope = cur_scope;
 		l->lines = (RefList*) malloc(sizeof(RefList));
 		l->lines->lineno = lineno;
 		l->lines->next = NULL;
+		
+		/* add to hashtable */
 		l->next = hash_table[hashval];
 		hash_table[hashval] = l; 
-		printf("Inserted %s for the first time with linenumber %d!\n", name, lineno); // error checking
+		printf("Inserted %s for the first time with linenumber %d!\n", name, lineno);
 	}
-	/* found in table, so just add line number */
+	/* found in table */
 	else{
-		l->scope = cur_scope;
-		RefList *t = l->lines;
-		while (t->next != NULL) t = t->next;
-		/* add linenumber to reference list */
-		t->next = (RefList*) malloc(sizeof(RefList));
-		t->next->lineno = lineno;
-		t->next->next = NULL;
-		printf("Found %s again at line %d!\n", name, lineno);
+		// just add line number
+		if(declare == 0){
+			/* find last reference */
+			RefList *t = l->lines;
+			while (t->next != NULL) t = t->next;
+			
+			/* add linenumber to reference list */
+			t->next = (RefList*) malloc(sizeof(RefList));
+			t->next->lineno = lineno;
+			t->next->next = NULL;
+			printf("Found %s again at line %d!\n", name, lineno);
+		}
+		/* new entry */
+		else{
+			/* same scope - multiple declaration error! */
+			if(l->scope == cur_scope){
+				fprintf(stderr, "A multiple declaration of variable %s at line %d\n", name, lineno);
+ 				exit(1);
+			}
+			/* other scope - create new entry */
+			else{
+				/* set up entry */
+				l = (list_t*) malloc(sizeof(list_t));
+				strncpy(l->st_name, name, len);  
+				l->st_type = type;
+				l->scope = cur_scope;
+				l->lines = (RefList*) malloc(sizeof(RefList));
+				l->lines->lineno = lineno;
+				l->lines->next = NULL;
+				
+				/* add to hashtable */
+				l->next = hash_table[hashval];
+				hash_table[hashval] = l; 
+				printf("Inserted %s for a new scope with linenumber %d!\n", name, lineno);
+			}	
+		}		
 	}
 }
 
@@ -56,18 +87,27 @@ list_t *lookup(char *name){ /* return symbol if found or NULL if not found */
 	unsigned int hashval = hash(name);
 	list_t *l = hash_table[hashval];
 	while ((l != NULL) && (strcmp(name,l->st_name) != 0)) l = l->next;
-	return l; // NULL is not found
-}
-
-list_t *lookup_scope(char *name, int scope){ /* return symbol if found or NULL if not found */
-	unsigned int hashval = hash(name);
-	list_t *l = hash_table[hashval];
-	while ((l != NULL) && (strcmp(name,l->st_name) != 0) && (scope != l->scope)) l = l->next;
-	return l; // NULL is not found
+	return l;
 }
 
 void hide_scope(){ /* hide the current scope */
-	if(cur_scope > 0) cur_scope--;
+	list_t *l;
+	int i;
+	printf("Hiding scope \'%d\':\n", cur_scope);
+	/* for all the lists */
+	for (i = 0; i < SIZE; i++){
+		if(hash_table[i] != NULL){
+			l = hash_table[i];
+			/* Find the first item that is from another scope */
+			while(l != NULL && l->scope == cur_scope){
+				printf("Hiding %s..\n", l->st_name);
+				l = l->next;
+			}
+			/* Set the list equal to that item */
+			hash_table[i] = l;
+		}
+	}
+	cur_scope--;
 }
 
 void incr_scope(){ /* go to next scope */
@@ -77,9 +117,9 @@ void incr_scope(){ /* go to next scope */
 /* print to stdout by default */ 
 void symtab_dump(FILE * of){  
   int i;
-  fprintf(of,"------------ ------ ------------\n");
-  fprintf(of,"Name         Type   Line Numbers\n");
-  fprintf(of,"------------ ------ -------------\n");
+  fprintf(of,"------------ ------ ------ ------------\n");
+  fprintf(of,"Name         Type   Scope  Line Numbers\n");
+  fprintf(of,"------------ ------ ------ ------------\n");
   for (i=0; i < SIZE; ++i){ 
 	if (hash_table[i] != NULL){ 
 		list_t *l = hash_table[i];
@@ -96,6 +136,13 @@ void symtab_dump(FILE * of){
 				else if (l->inf_type  == STR_TYPE) 	   fprintf(of,"%-7s","string");
 				else fprintf(of,"%-7s","undef");
 			}
+			else if (l->st_type == POINTER_TYPE){
+				fprintf(of,"%-7s %s","pointer to ");
+				if (l->inf_type == INT_TYPE) 		   fprintf(of,"%-7s","int");
+				else if (l->inf_type  == REAL_TYPE)    fprintf(of,"%-7s","real");
+				else if (l->inf_type  == STR_TYPE) 	   fprintf(of,"%-7s","string");
+				else fprintf(of,"%-7s","undef");
+			}
 			else if (l->st_type == FUNCTION_TYPE){
 				fprintf(of,"%-7s %s","function returns ");
 				if (l->inf_type == INT_TYPE) 		   fprintf(of,"%-7s","int");
@@ -104,6 +151,7 @@ void symtab_dump(FILE * of){
 				else fprintf(of,"%-7s","undef");
 			}
 			else fprintf(of,"%-7s","undef"); // if UNDEF or 0
+			fprintf(of,"  %d  ",l->scope);
 			while (t != NULL){
 				fprintf(of,"%4d ",t->lineno);
 			t = t->next;

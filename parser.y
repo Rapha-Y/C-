@@ -23,11 +23,11 @@
 %token<int_val> CHAR INT FLOAT DOUBLE IF ELSE WHILE FOR CONTINUE BREAK VOID RETURN
 %token<int_val> ADDOP MULOP DIVOP INCR OROP ANDOP NOTOP EQUOP RELOP
 %token<int_val> LPAREN RPAREN LBRACK RBRACK LBRACE RBRACE SEMI DOT COMMA ASSIGN REFER
-%token <symtab_item>   ID
-%token <int_val>       ICONST
-%token <double_val>    FCONST
-%token <char_val>      CCONST
-%token <str_val>       STRING
+%token <symtab_item> ID
+%token <int_val> 	 ICONST
+%token <double_val>  FCONST
+%token <char_val> 	 CCONST
+%token <str_val>     STRING
 
 /* precedencies and associativities */
 %left LPAREN RPAREN LBRACK RBRACK
@@ -41,10 +41,7 @@
 %right ASSIGN
 %left COMMA
 
-
 %start program
-
-/* expression rules */
 
 %%
 
@@ -53,7 +50,7 @@ program: declarations statements RETURN SEMI functions_optional ;
 /* declarations */
 declarations: declarations declaration | declaration;
 
-declaration: type names SEMI ;
+declaration: { declare = 1; } type names { declare = 0; } SEMI ;
 
 type: INT | CHAR | FLOAT | DOUBLE | VOID ;
 
@@ -68,9 +65,9 @@ pointer: pointer MULOP | MULOP ;
 
 array: array LBRACK expression RBRACK | LBRACK expression RBRACK ;
 
-init: var_init | array_init ;
+init: var_init | array_init ; 
 
-var_init : ID ASSIGN constant
+var_init : ID ASSIGN constant ;
 
 array_init: ID array ASSIGN LBRACE values RBRACE ;
 
@@ -85,8 +82,8 @@ statement:
 ;
 
 if_statement:
-	IF LPAREN expression RPAREN tail else_if optional_else |
-	IF LPAREN expression RPAREN tail optional_else
+		IF LPAREN expression RPAREN tail else_if optional_else |
+		IF LPAREN expression RPAREN tail optional_else
 ;
 
 else_if: 
@@ -114,9 +111,9 @@ expression:
     expression EQUOP expression |
     expression RELOP expression |
     LPAREN expression RPAREN |
-    var_ref |
+	var_ref |
     sign constant |
-    function_call
+	function_call
 ;
 
 sign: ADDOP | /* empty */ ; 
@@ -138,17 +135,17 @@ functions_optional: functions | /* empty */ ;
 
 functions: functions function | function ;
 
-function: function_head function_tail ;
+function: { incr_scope(); } function_head function_tail { hide_scope(); } ;
 		
 function_head: return_type ID LPAREN parameters_optional RPAREN ;
 
 return_type: type | type pointer ;
 
-parameters_optional: parameters | /* empty */ ;
+parameters_optional:  parameters | /* empty */ ;
 
 parameters: parameters COMMA parameter | parameter ;
 
-parameter : type variable ;
+parameter : { declare = 1; } type variable { declare = 0; } ;
 
 function_tail: LBRACE declarations_optional statements_optional return_optional RBRACE ;
 
