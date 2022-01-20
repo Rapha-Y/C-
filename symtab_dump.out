@@ -1,12 +1,12 @@
 ------------ ------ ------ ------------
 Name         Type   Scope  Line Numbers
 ------------ ------ ------ ------------
-func1        undef    0    21   55 
-func2        undef    0    45   60 
-add          undef    0    22   28   69 
-c            undef    0     6   45 
-i            undef    0     5   14   14   14   16   19   20   20   22   23   28   29   30   36   42   43   46 
-p            undef    0     8   11   22   28   32   32 
-val          undef    0     7   21   22   28   29   36 
-res          undef    0     7   11   23   29   30 
-print        undef    0    23   24   30   31   37   43   44   49   66 
+func1        undef    0    16 
+func2        undef    0    38 
+add          undef    0    17   23 
+c            undef    0     5   38 
+i            undef    0     4   10   10   10   11   14   15   15   17   18   23   24   25   30   35   36   39 
+p            undef    0     7    9   17   23   27   27 
+val          undef    0     6   16   17   23   24   30 
+res          undef    0     6    9   18   24   25 
+print        undef    0    18   19   25   26   31   36   37   41   53 

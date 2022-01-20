@@ -123,13 +123,13 @@ constant: ICONST | FCONST | CCONST ;
 
 assigment: var_ref ASSIGN expression ;
 
-var_ref  : variable | REFER variable ; 
+var_ref: variable | REFER variable ; 
 
-function_call: ID LPAREN call_params RPAREN;
+function_call: ID LPAREN call_params RPAREN ;
 
 call_params: call_param | STRING | /* empty */
 
-call_param : call_param COMMA expression | expression ; 
+call_param: call_param COMMA expression | expression ; 
 
 /* functions */
 functions_optional: functions | /* empty */ ;
@@ -137,8 +137,8 @@ functions_optional: functions | /* empty */ ;
 functions: functions function | function ;
 
 function: { incr_scope(); } function_head function_tail { hide_scope(); } ;
-		
-function_head: return_type ID LPAREN parameters_optional RPAREN ;
+
+function_head: { declare = 1; } return_type ID LPAREN { declare = 0; } parameters_optional RPAREN ;
 
 return_type: type | type pointer ;
 
@@ -165,21 +165,33 @@ void yyerror ()
 }
 
 int main (int argc, char *argv[]){
-
+	
 	// initialize symbol table
 	init_hash_table();
-
+	
+	// initialize revisit queue
+	queue = NULL;
+	
 	// parsing
 	int flag;
 	yyin = fopen(argv[1], "r");
 	flag = yyparse();
 	fclose(yyin);
 	
-	printf("Parsing finished!");
+	printf("Parsing finished!\n");
+	
+	if(queue != NULL){
+		printf("Warning: Something has not been checked in the revisit queue!\n");
+	}
 	
 	// symbol table dump
 	yyout = fopen("symtab_dump.out", "w");
 	symtab_dump(yyout);
+	fclose(yyout);
+	
+	// revisit queue dump
+	yyout = fopen("revisit_dump.out", "w");
+	revisit_dump(yyout);
 	fclose(yyout);
 	
 	return flag;
