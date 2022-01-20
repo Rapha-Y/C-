@@ -1,4 +1,5 @@
 %{
+	#include "semantics.c"
 	#include "symtab.c"
 	#include <stdio.h>
 	#include <stdlib.h>
@@ -48,7 +49,7 @@
 program: declarations statements RETURN SEMI functions_optional ;
 
 /* declarations */
-declarations: declarations declaration | declaration;
+declarations: declarations declaration | declaration ;
 
 declaration: { declare = 1; } type names { declare = 0; } SEMI ;
 
