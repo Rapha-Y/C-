@@ -1,6 +1,8 @@
 %{
 	#include "semantics.c"
 	#include "symtab.c"
+	#include "ast.h"
+	#include "ast.c"
 	#include <stdio.h>
 	#include <stdlib.h>
 	#include <string.h>
@@ -18,6 +20,7 @@
 	double double_val;
 	char* str_val;
 	list_t* symtab_item;
+	AST_Node* node;
 }
 
 /* token definition */

@@ -6,6 +6,7 @@
 	#include <string.h>
 	#include "symtab.h"
 	#include "semantics.h"
+	#include "ast.h"
 	#include "parser.tab.h"
 	extern FILE *yyin;
 	extern FILE *yyout;
