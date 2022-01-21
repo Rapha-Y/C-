@@ -15,10 +15,13 @@
 
 /* YYSTYPE union */
 %union{
+	// simple values (will remove them later on)
     char char_val;
 	int int_val;
 	double double_val;
 	char* str_val;
+	
+	// structures
 	list_t* symtab_item;
 	AST_Node* node;
 }
@@ -44,6 +47,8 @@
 %left ANDOP
 %right ASSIGN
 %left COMMA
+
+/* rule (non-terminal) definitions */
 
 %start program
 
@@ -132,7 +137,7 @@ function_call: ID LPAREN call_params RPAREN ;
 
 call_params: call_param | STRING | /* empty */
 
-call_param: call_param COMMA expression | expression ; 
+call_param: call_param COMMA expression | expression ;
 
 /* functions */
 functions_optional: functions | /* empty */ ;

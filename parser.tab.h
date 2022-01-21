@@ -93,15 +93,19 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 15 "parser.y"
+#line 17 "parser.y"
 
+	// simple values (will remove them later on)
     char char_val;
 	int int_val;
 	double double_val;
 	char* str_val;
+	
+	// structures
 	list_t* symtab_item;
+	AST_Node* node;
 
-#line 105 "parser.tab.h"
+#line 109 "parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

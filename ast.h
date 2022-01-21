@@ -80,7 +80,8 @@ typedef struct AST_Node_Decl{
 	int data_type;
 	
 	// symbol table entries of the variables
-	list_t** names;
+	list_t **names;
+	int names_count;
 }AST_Node_Decl;
 
 typedef struct AST_Node_Const{
@@ -105,6 +106,7 @@ typedef struct AST_Node_If{
 	
 	// else if branches
 	struct AST_Node **elsif_branches;
+	int elseif_count;
 	
 	// else branch
 	struct AST_Node *else_branch;
@@ -183,7 +185,8 @@ typedef struct AST_Node_Func_Call{
 	list_t *entry;
 	
 	// call parameters
-	AST_Node **params;	
+	AST_Node **params;
+	int num_of_pars;
 }AST_Node_Func_Call;
 
 /* Expressions */
@@ -249,9 +252,35 @@ typedef struct AST_Node_Return{
 }AST_Node_Return;
 
 /* ------------------AST NODE MANAGEMENT-------------------- */
+
 /* The basic node */
 AST_Node *new_ast_node(Node_Type type, AST_Node *left, AST_Node *right); 	 // simple nodes
+
 /* Declarations */
-AST_Node *new_ast_decl_node(int data_type, list_t **names);					 // declaration
+AST_Node *new_ast_decl_node(int data_type, list_t **names, int names_count); // declaration
 AST_Node *new_ast_const_node(int const_type, Value val);					 // constant
-/* ... */
+
+/* Statements */
+AST_Node *new_ast_if_node(AST_Node *condition, AST_Node *if_branch, AST_Node **elsif_branches, 
+	int elseif_count, AST_Node *else_branch);
+AST_Node *new_ast_elsif_node(AST_Node *condition, AST_Node *elsif_branch);
+AST_Node *new_ast_for_node(AST_Node *initialize, AST_Node *condition, AST_Node *increment, AST_Node *for_branch);
+AST_Node *new_ast_while_node(AST_Node *condition, AST_Node *while_branch);
+AST_Node *new_ast_assign_node(list_t *entry, AST_Node *assign_val);
+AST_Node *new_ast_simple_node(int statement_type);							 // continue, break or "main" return
+AST_Node *new_ast_incr_node(list_t *entry, int incr_type, int pf_type);      // increment decrement
+AST_Node *new_ast_func_call_node(list_t *entry, AST_Node **params, int num_of_pars); // function call
+
+/* Expressions */
+AST_Node *new_ast_arithm_node(enum Arithm_op op, AST_Node *left, AST_Node *right);
+AST_Node *new_ast_bool_node(enum Bool_op op, AST_Node *left, AST_Node *right);
+AST_Node *new_ast_rel_node(enum Rel_op op, AST_Node *left, AST_Node *right);
+AST_Node *new_ast_equ_node(enum Equ_op op, AST_Node *left, AST_Node *right);
+
+/* Functions */
+AST_Node *new_ast_func_decl_node(int ret_type, list_t *entry);				 // function declaration
+AST_Node *new_ast_return_node(int ret_type, AST_Node *ret_val);				 // function return
+
+/* Tree Traversal */
+void ast_print_node(AST_Node *node);	// print information of node
+void ast_traversal(AST_Node *node);		// tree traversal (for testing right now)

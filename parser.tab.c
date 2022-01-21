@@ -70,6 +70,8 @@
 
 	#include "semantics.c"
 	#include "symtab.c"
+	#include "ast.h"
+	#include "ast.c"
 	#include <stdio.h>
 	#include <stdlib.h>
 	#include <string.h>
@@ -79,7 +81,7 @@
 	extern int yylex();
 	void yyerror();
 
-#line 83 "parser.tab.c"
+#line 85 "parser.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -171,15 +173,19 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 15 "parser.y"
+#line 17 "parser.y"
 
+	// simple values (will remove them later on)
     char char_val;
 	int int_val;
 	double double_val;
 	char* str_val;
+	
+	// structures
 	list_t* symtab_item;
+	AST_Node* node;
 
-#line 183 "parser.tab.c"
+#line 189 "parser.tab.c"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -558,17 +564,17 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    49,    49,    52,    52,    54,    54,    54,    56,    56,
-      56,    56,    56,    58,    58,    58,    58,    60,    61,    62,
-      65,    65,    67,    67,    69,    69,    71,    73,    75,    75,
-      78,    78,    81,    81,    81,    81,    82,    82,    82,    82,
-      82,    86,    87,    91,    92,    95,    95,    97,    99,   101,
-     104,   105,   106,   107,   108,   109,   110,   111,   112,   113,
-     114,   115,   116,   117,   120,   120,   122,   122,   122,   124,
-     126,   126,   128,   130,   130,   130,   132,   132,   135,   135,
-     137,   137,   139,   139,   141,   141,   141,   143,   143,   145,
-     145,   147,   147,   149,   149,   151,   153,   153,   155,   155,
-     157,   157
+       0,    57,    57,    60,    60,    62,    62,    62,    64,    64,
+      64,    64,    64,    66,    66,    66,    66,    68,    69,    70,
+      73,    73,    75,    75,    77,    77,    79,    81,    83,    83,
+      86,    86,    89,    89,    89,    89,    90,    90,    90,    90,
+      90,    94,    95,    99,   100,   103,   103,   105,   107,   109,
+     112,   113,   114,   115,   116,   117,   118,   119,   120,   121,
+     122,   123,   124,   125,   128,   128,   130,   130,   130,   132,
+     134,   134,   136,   138,   138,   138,   140,   140,   143,   143,
+     145,   145,   147,   147,   149,   149,   149,   151,   151,   153,
+     153,   155,   155,   157,   157,   159,   161,   161,   163,   163,
+     165,   165
 };
 #endif
 
@@ -1507,55 +1513,55 @@ yyreduce:
   switch (yyn)
     {
   case 5:
-#line 54 "parser.y"
+#line 62 "parser.y"
              { declare = 1; }
-#line 1513 "parser.tab.c"
-    break;
-
-  case 6:
-#line 54 "parser.y"
-                                         { declare = 0; }
 #line 1519 "parser.tab.c"
     break;
 
-  case 82:
-#line 139 "parser.y"
-          { incr_scope(); }
+  case 6:
+#line 62 "parser.y"
+                                         { declare = 0; }
 #line 1525 "parser.tab.c"
     break;
 
-  case 83:
-#line 139 "parser.y"
-                                                        { hide_scope(); }
+  case 82:
+#line 147 "parser.y"
+          { incr_scope(); }
 #line 1531 "parser.tab.c"
     break;
 
-  case 84:
-#line 141 "parser.y"
-               { declare = 1; }
+  case 83:
+#line 147 "parser.y"
+                                                        { hide_scope(); }
 #line 1537 "parser.tab.c"
     break;
 
-  case 85:
-#line 141 "parser.y"
-                                                      { declare = 0; }
+  case 84:
+#line 149 "parser.y"
+               { declare = 1; }
 #line 1543 "parser.tab.c"
     break;
 
-  case 93:
+  case 85:
 #line 149 "parser.y"
-            { declare = 1; }
+                                                      { declare = 0; }
 #line 1549 "parser.tab.c"
     break;
 
-  case 94:
-#line 149 "parser.y"
-                                           { declare = 0; }
+  case 93:
+#line 157 "parser.y"
+            { declare = 1; }
 #line 1555 "parser.tab.c"
     break;
 
+  case 94:
+#line 157 "parser.y"
+                                           { declare = 0; }
+#line 1561 "parser.tab.c"
+    break;
 
-#line 1559 "parser.tab.c"
+
+#line 1565 "parser.tab.c"
 
       default: break;
     }
@@ -1787,7 +1793,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 159 "parser.y"
+#line 167 "parser.y"
 
 
 void yyerror ()
