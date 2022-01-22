@@ -21,6 +21,11 @@
 	void add_to_vals(Value val);
 	Value *vals;
 	int vc = 0;
+	
+	// for else ifs
+	void add_elseif(AST_Node *elsif);
+	AST_Node **elsifs;
+	int elseif_count = 0;
 %}
 
 /* YYSTYPE union */
@@ -73,12 +78,14 @@
 %type <node> expression var_ref
 %type <val> sign
 %type <node> statement assigment
+%type <node> statements tail
+%type <node> if_statement else_if optional_else
 
 %start program
 
 %%
 
-program: declarations statements RETURN SEMI functions_optional ;
+program: declarations statements { ast_traversal($2); } RETURN SEMI functions_optional ;
 
 /* declarations */
 declarations: declarations declaration | declaration ;
@@ -214,26 +221,36 @@ values: values COMMA constant
 ;
 
 /* statements */
-statements: statements statement | statement ;
+statements:
+	statements statement
+	{
+		AST_Node_Statements *temp = (AST_Node_Statements*) $1;
+		$$ = new_statements_node(temp->statements, temp->statement_count, $2);
+	}
+	| statement
+	{
+		$$ = new_statements_node(NULL, 0, $1);
+	}
+;
 
 statement:
-	if_statement { $$ = NULL; /* will do it later ! */ }
+	if_statement
+	{ 
+		$$ = $1; /* just pass information */
+	}
 	| for_statement { $$ = NULL; /* will do it later ! */ }
 	| while_statement { $$ = NULL; /* will do it later ! */ }
 	| assigment SEMI
 	{
 		$$ = $1; /* just pass information */
-		ast_traversal($$); /* just for testing */
 	}
 	| CONTINUE SEMI
 	{ 
 		$$ = new_ast_simple_node(0);
-		ast_traversal($$); /* just for testing */
 	}
 	| BREAK SEMI
 	{ 
 		$$ = new_ast_simple_node(1);
-		ast_traversal($$); /* just for testing */
 	}
 	| function_call SEMI { $$ = NULL; /* will do it later ! */ }
 	| ID INCR SEMI
@@ -245,7 +262,6 @@ statement:
 		else{
 			$$ = new_ast_incr_node($1, 1, 0);
 		}
-		ast_traversal($$); /* just for testing */
 	}
 	| INCR ID SEMI
 	{
@@ -256,43 +272,71 @@ statement:
 		else{
 			$$ = new_ast_incr_node($2, 1, 1);
 		}
-		ast_traversal($$); /* just for testing */
 	}
 ;
 
 if_statement:
-		IF LPAREN expression RPAREN tail else_if optional_else |
-		IF LPAREN expression RPAREN tail optional_else
+	IF LPAREN expression RPAREN tail else_if optional_else
+	{
+		$$ = new_ast_if_node($3, $5, elsifs, elseif_count, $7);
+		elseif_count = 0;
+		elsifs = NULL;
+	}
+	| IF LPAREN expression RPAREN tail optional_else
+	{
+		$$ = new_ast_if_node($3, $5, NULL, 0, $6);
+	}
 ;
 
-else_if: 
-	else_if ELSE IF LPAREN expression RPAREN tail |
-	ELSE IF LPAREN expression RPAREN tail
+else_if:
+	else_if ELSE IF LPAREN expression RPAREN tail
+	{
+		AST_Node *temp = new_ast_elsif_node($5, $7);
+		add_elseif(temp);
+	}
+	| ELSE IF LPAREN expression RPAREN tail
+	{
+		AST_Node *temp = new_ast_elsif_node($4, $6);
+		add_elseif(temp);
+	}
 ;
 
-optional_else: ELSE tail | /* empty */ ;
+optional_else:
+	ELSE tail
+	{
+		/* else exists */
+		$$ = $2;
+	}
+	| /* empty */
+	{
+		/* no else */
+		$$ = NULL;
+	}
+;
 
 for_statement: FOR LPAREN assigment SEMI expression SEMI expression RPAREN tail ;
 
 while_statement: WHILE LPAREN expression RPAREN tail ;
 
-tail: LBRACE statements RBRACE ;
+tail: LBRACE statements RBRACE
+{ 
+	$$ = $2; /* just pass information */
+	ast_traversal($2);
+}
+;
 
 expression:
     expression ADDOP expression
 	{ 
 	    $$ = new_ast_arithm_node($2.ival, $1, $3);
-		ast_traversal($$); /* just for testing */
 	}
 	| expression MULOP expression
 	{
 	    $$ = new_ast_arithm_node(MUL, $1, $3);
-		ast_traversal($$); /* just for testing */
 	}
 	| expression DIVOP expression
 	{
 		$$ = new_ast_arithm_node(DIV, $1, $3);
-		ast_traversal($$); /* just for testing */
 	}
 	| ID INCR
 	{
@@ -302,8 +346,7 @@ expression:
 		}
 		else{
 			$$ = new_ast_incr_node($1, 1, 0);
-		}
-		ast_traversal($$); /* just for testing */		
+		}	
 	}
 	| INCR ID
 	{
@@ -314,32 +357,26 @@ expression:
 		else{
 			$$ = new_ast_incr_node($2, 1, 1);
 		}
-		ast_traversal($$); /* just for testing */
 	}
 	| expression OROP expression
 	{
 		$$ = new_ast_bool_node(OR, $1, $3);
-		ast_traversal($$); /* just for testing */
 	}
 	| expression ANDOP expression
 	{
 		$$ = new_ast_bool_node(AND, $1, $3);
-		ast_traversal($$); /* just for testing */
 	}
 	| NOTOP expression
 	{
 	    $$ = new_ast_bool_node(NOT, $2, NULL);
-		ast_traversal($$); /* just for testing */
 	}
 	| expression EQUOP expression
 	{
 		$$ = new_ast_equ_node($2.ival, $1, $3);
-		ast_traversal($$); /* just for testing */
 	}
 	| expression RELOP expression
 	{
 		$$ = new_ast_rel_node($2.ival, $1, $3);
-		ast_traversal($$); /* just for testing */
 	}
 	| LPAREN expression RPAREN
 	{
@@ -376,7 +413,6 @@ expression:
 		else{
 			$$ = $2;
 		}
-	    ast_traversal($$); /* just for testing */
 	}
 	| function_call
 	{
@@ -451,7 +487,7 @@ function_tail: LBRACE declarations_optional statements_optional return_optional 
 
 declarations_optional: declarations | /* empty */ ;
 
-statements_optional: statements | /* empty */ ;
+statements_optional: statements { ast_traversal($1); } | /* empty */ ;
 
 return_optional: RETURN expression SEMI | /* empty */ ;
 
@@ -490,6 +526,21 @@ void add_to_vals(Value val){
 		vc++;
 		vals = (Value *) realloc(vals, vc * sizeof(Value));
 		vals[vc - 1] = val;
+	}
+}
+
+void add_elseif(AST_Node *elsif){
+	// first entry
+	if(elseif_count == 0){
+		elseif_count = 1;
+		elsifs = (AST_Node **) malloc(1 * sizeof(AST_Node));
+		elsifs[0] = elsif;
+	}
+	// general case
+	else{
+		elseif_count++;
+		elsifs = (AST_Node **) realloc(elsifs, elseif_count * sizeof(AST_Node));
+		elsifs[elseif_count - 1] = elsif;
 	}
 }
 

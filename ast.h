@@ -6,12 +6,13 @@ typedef enum Node_Type {
 	DECL_NODE,   // declaration
 	CONST_NODE,  // constant
 	// statements
+	STATEMENTS,  // statements
 	IF_NODE,     // if statement
 	ELSIF_NODE,  // else if branch
 	FOR_NODE,    // for statement
 	WHILE_NODE,  // while statement
 	ASSIGN_NODE, // assigment
-	SIMPLE_NODE, // continue, break and "main" return statements
+	SIMPLE_NODE, // continue or break statement
 	INCR_NODE,   // increment statement (non-expression one)
 	FUNC_CALL,   // function call
 	// expressions
@@ -86,6 +87,14 @@ typedef struct AST_Node_Const{
 }AST_Node_Const;
 
 /* Statements */
+typedef struct AST_Node_Statements{
+	enum Node_Type type; // node type
+	
+	// statements
+	struct AST_Node **statements;
+	int statement_count;
+}AST_Node_Statements;
+
 typedef struct AST_Node_If{
 	enum Node_Type type; // node type
 	
@@ -265,6 +274,7 @@ AST_Node *new_ast_decl_node(int data_type, list_t **names, int names_count); // 
 AST_Node *new_ast_const_node(int const_type, Value val);					 // constant
 
 /* Statements */
+AST_Node *new_statements_node(AST_Node **statements, int statement_count, AST_Node *statement);
 AST_Node *new_ast_if_node(AST_Node *condition, AST_Node *if_branch, AST_Node **elsif_branches, 
 	int elseif_count, AST_Node *else_branch);
 AST_Node *new_ast_elsif_node(AST_Node *condition, AST_Node *elsif_branch);
