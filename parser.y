@@ -11,30 +11,44 @@
 	extern int lineno;
 	extern int yylex();
 	void yyerror();
+	
+	// for declarations
+	void add_to_names(list_t *entry);
+	list_t **names;
+	int nc = 0;
+	
+	// for the initializations of arrays
+	void add_to_vals(Value val);
+	Value *vals;
+	int vc = 0;
 %}
 
 /* YYSTYPE union */
 %union{
-	// simple values (will remove them later on)
-    char char_val;
-	int int_val;
-	double double_val;
-	char* str_val;
+	// different types of values
+	Value val;   
 	
 	// structures
 	list_t* symtab_item;
 	AST_Node* node;
+	
+	// for declarations
+	int data_type;
+	int const_type;
+	
+	// for arrays
+	int array_size;
 }
 
 /* token definition */
-%token<int_val> CHAR INT FLOAT DOUBLE IF ELSE WHILE FOR CONTINUE BREAK VOID RETURN
-%token<int_val> ADDOP MULOP DIVOP INCR OROP ANDOP NOTOP EQUOP RELOP
-%token<int_val> LPAREN RPAREN LBRACK RBRACK LBRACE RBRACE SEMI DOT COMMA ASSIGN REFER
+%token<val> CHAR INT FLOAT DOUBLE IF ELSE WHILE FOR CONTINUE BREAK VOID RETURN
+%token<val> ADDOP MULOP DIVOP INCR OROP ANDOP NOTOP EQUOP RELOP
+%token<val> LPAREN RPAREN LBRACK RBRACK LBRACE RBRACE SEMI DOT COMMA ASSIGN REFER
 %token <symtab_item> ID
-%token <int_val> 	 ICONST
-%token <double_val>  FCONST
-%token <char_val> 	 CCONST
-%token <str_val>     STRING
+%token <val> 	 ICONST
+%token <val>  	 FCONST
+%token <val> 	 CCONST
+%token <val>     STRING
 
 /* precedencies and associativities */
 %left LPAREN RPAREN LBRACK RBRACK
@@ -49,6 +63,13 @@
 %left COMMA
 
 /* rule (non-terminal) definitions */
+%type <node> program
+%type <node> declarations declaration
+%type <data_type> type
+%type <symtab_item> variable
+%type <array_size> array
+%type <symtab_item> init var_init array_init
+%type <node> constant
 
 %start program
 
@@ -59,28 +80,132 @@ program: declarations statements RETURN SEMI functions_optional ;
 /* declarations */
 declarations: declarations declaration | declaration ;
 
-declaration: { declare = 1; } type names { declare = 0; } SEMI ;
-
-type: INT | CHAR | FLOAT | DOUBLE | VOID ;
-
-names: names COMMA variable | names COMMA init | variable | init ;
-
-variable: ID |
-    pointer ID |
-    ID array
+declaration: type { declare = 1; } names { declare = 0; } SEMI
+	{
+		int i;
+		$$ = new_ast_decl_node($1, names, nc);
+		nc = 0;
+		
+		AST_Node_Decl *temp = (AST_Node_Decl*) $$;
+		
+		// declare types of the names
+		for(i=0; i < temp->names_count; i++){
+			// variable
+			if(temp->names[i]->st_type == UNDEF){
+				set_type(temp->names[i]->st_name, temp->data_type, UNDEF);
+			}
+			// pointer
+			else if(temp->names[i]->st_type == POINTER_TYPE){
+				set_type(temp->names[i]->st_name, POINTER_TYPE, temp->data_type);
+			}
+			// array
+			else if(temp->names[i]->st_type == ARRAY_TYPE){
+				set_type(temp->names[i]->st_name, ARRAY_TYPE, temp->data_type);
+			}
+		}
+		ast_traversal($$); /* just for testing */
+	}
 ;
 
-pointer: pointer MULOP | MULOP ;
+type: INT  		{ $$ = INT_TYPE;   }
+	| CHAR 		{ $$ = CHAR_TYPE;  }
+	| FLOAT 	{ $$ = REAL_TYPE;  }
+	| DOUBLE 	{ $$ = REAL_TYPE;  }
+	| VOID 		{ $$ = VOID_TYPE;  }
+;
 
-array: array LBRACK expression RBRACK | LBRACK expression RBRACK ;
+names: names COMMA variable
+	{
+		add_to_names($3);
+	}
+	| names COMMA init
+	{
+		add_to_names($3);
+	}
+	| variable
+	{
+		add_to_names($1);
+	}
+	| init
+	{ 
+		add_to_names($1);
+	}
+;
 
-init: var_init | array_init ; 
+variable: ID { $$ = $1; }
+	| pointer ID
+	{
+		$2->st_type = POINTER_TYPE;
+		$$ = $2;
+	}
+	| ID array
+	{
+		$1->st_type = ARRAY_TYPE;
+		$1->array_size = $2;
+		$$ = $1;
+	}
+;
 
-var_init : ID ASSIGN constant ;
+pointer: pointer MULOP | MULOP ; /* for now we suppose everything is a simple pointer! */
 
-array_init: ID array ASSIGN LBRACE values RBRACE ;
+array: array LBRACK expression RBRACK
+	{ 
+	    // if declaration then error!
+		if(declare == 1){
+			fprintf(stderr, "Array declaration at %d contains expression!\n", lineno);
+		}
+	}
+	| LBRACK expression RBRACK
+	{
+		// if declaration then error!
+		if(declare == 1){
+			fprintf(stderr, "Array declaration at %d contains expression!\n", lineno);
+		}
+	}
+	| LBRACK ICONST RBRACK
+	{
+		// set array_size for declaration purposes
+		$$ = $2.ival;
+	}
+;
 
-values: values COMMA constant | constant ;
+init:
+	var_init { $$ = $1; }
+	| array_init { $$ = $1; }
+; 
+
+var_init : ID ASSIGN constant
+{ 
+	AST_Node_Const *temp = (AST_Node_Const*) $$;
+	$1->val = temp->val;
+	$1->st_type = temp->const_type;
+	$$ = $1;
+}
+;
+
+array_init: ID array ASSIGN LBRACE values RBRACE
+{
+	if($1->array_size != vc){
+	    fprintf(stderr, "Array init at %d doesn't contain the right amount of values!\n", lineno);
+	}
+	$1->vals = vals;
+	$1->array_size = $2;
+	$$ = $1;
+	vc = 0;
+}
+;
+
+values: values COMMA constant 
+	{
+		AST_Node_Const *temp = (AST_Node_Const*) $3;
+		add_to_vals(temp->val);
+	}
+	| constant
+	{
+		AST_Node_Const *temp = (AST_Node_Const*) $1;
+		add_to_vals(temp->val);
+	}
+;
 
 /* statements */
 statements: statements statement | statement ;
@@ -127,7 +252,11 @@ expression:
 
 sign: ADDOP | /* empty */ ; 
 
-constant: ICONST | FCONST | CCONST ;
+constant:
+	ICONST   { $$ = new_ast_const_node(INT_TYPE, $1);  }
+	| FCONST { $$ = new_ast_const_node(REAL_TYPE, $1); }
+	| CCONST { $$ = new_ast_const_node(CHAR_TYPE, $1); }
+;
 
 assigment: var_ref ASSIGN expression ;
 
@@ -170,6 +299,36 @@ void yyerror ()
 {
   fprintf(stderr, "Syntax error at line %d\n", lineno);
   exit(1);
+}
+
+void add_to_names(list_t *entry){
+	// first entry
+	if(nc == 0){
+		nc = 1;
+		names = (list_t **) malloc( 1 * sizeof(list_t *));
+		names[0] = entry;
+	}
+	// general case
+	else{
+		nc++;
+		names = (list_t **) realloc(names, nc * sizeof(list_t *));
+		names[nc - 1] = entry;		
+	}
+}
+
+void add_to_vals(Value val){
+	// first entry
+	if(vc == 0){
+		vc = 1;
+		vals = (Value *) malloc(1 * sizeof(Value));
+		vals[0] = val;
+	}
+	// general case
+	else{
+		vc++;
+		vals = (Value *) realloc(vals, vc * sizeof(Value));
+		vals[vc - 1] = val;
+	}
 }
 
 int main (int argc, char *argv[]){

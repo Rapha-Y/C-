@@ -48,7 +48,8 @@ AST_Node *new_ast_const_node(int const_type, Value val){
 
 /* Statements */
 
-AST_Node *new_ast_if_node(AST_Node *condition, AST_Node *if_branch, AST_Node **elsif_branches, int elseif_count, AST_Node *else_branch){
+AST_Node *new_ast_if_node(AST_Node *condition, AST_Node *if_branch, AST_Node **elsif_branches,
+	int elseif_count, AST_Node *else_branch){
 	// allocate memory
 	AST_Node_If *v = malloc (sizeof (AST_Node_If));
 	

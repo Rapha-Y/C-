@@ -8,6 +8,14 @@
 #define BY_VALUE 1
 #define BY_REFER 2
 
+/* Types of values that we can have */
+typedef union Value{
+	int ival;
+	double fval;
+	char cval;
+	char *sval;
+}Value;
+
 /* parameter struct */
 typedef struct Param{
 	// parameter type and name
@@ -15,7 +23,7 @@ typedef struct Param{
 	char param_name[MAXTOKENLEN];
 	
 	// to store the value
-	int ival; double fval; char *st_sval;
+	Value val;
 	int passing; // value or reference
 }Param;
 
@@ -33,8 +41,8 @@ typedef struct list_t{
     int scope;
     RefList *lines;
     
-	// to store value and sometimes more information
-	int st_ival; double st_fval; char st_sval;
+	// to store value
+	Value val;
 	
 	// type
     int st_type;
@@ -44,7 +52,7 @@ typedef struct list_t{
 	int inf_type;
 	
 	// array stuff
-	int *i_vals; double *f_vals; char *s_vals;
+	Value *vals;
 	int array_size;
 	
 	// function parameters
