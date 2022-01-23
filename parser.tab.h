@@ -94,7 +94,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 32 "parser.y"
+#line 35 "parser.y"
 
 	// different types of values
 	Value val;   
@@ -109,8 +109,11 @@ union YYSTYPE
 	
 	// for arrays
 	int array_size;
+	
+	// for parameters
+	Param par;
 
-#line 114 "parser.tab.h"
+#line 117 "parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

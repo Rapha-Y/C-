@@ -4,7 +4,7 @@
 int i;                    // simple variable
 char c = 'c';             // one with init
 double val = 2.5, res[6]; // two variables, one with init and one array
-double *p;                // pointer variable				  
+double *p;                // pointer variable
 // statements
 p = &res; // assigment
 for(i = 0; i < 10; i++){ // for
@@ -56,6 +56,6 @@ double add (double a, int b){  /* with two parameters */
     // declarations
     double res;
     // statements
-    res = a + b;
+    res = a + b + (-5);
     return res;
 }

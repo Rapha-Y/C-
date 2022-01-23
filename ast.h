@@ -16,6 +16,7 @@ typedef enum Node_Type {
 	SIMPLE_NODE,  // continue or break statement
 	INCR_NODE,    // increment statement (non-expression one)
 	FUNC_CALL,    // function call
+	CALL_PARAMS,  // function call parameters
 	// expressions
 	ARITHM_NODE,  // arithmetic expression
 	BOOL_NODE,    // boolean expression
@@ -207,6 +208,14 @@ typedef struct AST_Node_Func_Call{
 	int num_of_pars;
 }AST_Node_Func_Call;
 
+typedef struct AST_Node_Call_Params{
+	enum Node_Type type; // node type
+	
+	// call parameters
+	AST_Node **params;
+	int num_of_pars;
+}AST_Node_Call_Params;
+
 /* Expressions */
 typedef struct AST_Node_Arithm{
 	enum Node_Type type; // node type
@@ -335,6 +344,7 @@ AST_Node *new_ast_assign_node(list_t *entry, int ref, AST_Node *assign_val);
 AST_Node *new_ast_simple_node(int statement_type);							 // continue or break
 AST_Node *new_ast_incr_node(list_t *entry, int incr_type, int pf_type);      // increment decrement
 AST_Node *new_ast_func_call_node(list_t *entry, AST_Node **params, int num_of_pars); // function call
+AST_Node *new_ast_call_params_node(AST_Node **params, int num_of_pars, AST_Node *param);
 
 /* Expressions */
 AST_Node *new_ast_arithm_node(enum Arithm_op op, AST_Node *left, AST_Node *right);
