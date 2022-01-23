@@ -599,8 +599,8 @@ static const yytype_int16 yyrline[] =
      419,   423,   427,   431,   435,   439,   443,   471,   478,   479,
      480,   483,   490,   494,   500,   508,   512,   518,   528,   533,
      541,   546,   552,   557,   563,   563,   570,   571,   570,   595,
-     599,   606,   611,   617,   622,   628,   628,   635,   638,   643,
-     649,   654,   660,   665
+     599,   606,   611,   617,   622,   628,   628,   648,   651,   656,
+     662,   667,   673,   678
 };
 #endif
 
@@ -2378,61 +2378,74 @@ yyreduce:
 #line 629 "parser.y"
 { 
 	declare = 0;
+	
+	// set type of symbol table entry	
+	if((yyvsp[0].symtab_item)->st_type == UNDEF){ /* "simple" type */
+		set_type((yyvsp[0].symtab_item)->st_name, (yyvsp[-1].data_type), UNDEF); 
+	}
+	else if((yyvsp[0].symtab_item)->st_type == POINTER_TYPE){ /* pointer */
+		set_type((yyvsp[0].symtab_item)->st_name, POINTER_TYPE, (yyvsp[-1].data_type));
+	}
+	else if((yyvsp[0].symtab_item)->st_type == ARRAY_TYPE){ /* array  */
+		set_type((yyvsp[0].symtab_item)->st_name, ARRAY_TYPE, (yyvsp[-1].data_type));
+	}
+	
+	/* define parameter */
 	(yyval.par) = def_param((yyvsp[-1].data_type), (yyvsp[0].symtab_item)->st_name, 0);
 }
-#line 2384 "parser.tab.c"
+#line 2397 "parser.tab.c"
     break;
 
   case 98:
-#line 639 "parser.y"
+#line 652 "parser.y"
         {
 		temp_function->declarations = (yyvsp[0].node);
 	}
-#line 2392 "parser.tab.c"
+#line 2405 "parser.tab.c"
     break;
 
   case 99:
-#line 643 "parser.y"
+#line 656 "parser.y"
         {
 		temp_function->declarations = NULL;
 	}
-#line 2400 "parser.tab.c"
+#line 2413 "parser.tab.c"
     break;
 
   case 100:
-#line 650 "parser.y"
+#line 663 "parser.y"
         {
 		temp_function->statements = (yyvsp[0].node);
 	}
-#line 2408 "parser.tab.c"
+#line 2421 "parser.tab.c"
     break;
 
   case 101:
-#line 654 "parser.y"
+#line 667 "parser.y"
         {
 		temp_function->statements = NULL;
 	}
-#line 2416 "parser.tab.c"
+#line 2429 "parser.tab.c"
     break;
 
   case 102:
-#line 661 "parser.y"
+#line 674 "parser.y"
         {
 		temp_function->return_node = new_ast_return_node(temp_function->ret_type, (yyvsp[-1].node));
 	}
-#line 2424 "parser.tab.c"
+#line 2437 "parser.tab.c"
     break;
 
   case 103:
-#line 665 "parser.y"
+#line 678 "parser.y"
         {
 		temp_function->return_node = NULL;
 	}
-#line 2432 "parser.tab.c"
+#line 2445 "parser.tab.c"
     break;
 
 
-#line 2436 "parser.tab.c"
+#line 2449 "parser.tab.c"
 
       default: break;
     }
@@ -2664,7 +2677,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 670 "parser.y"
+#line 683 "parser.y"
 
 
 void yyerror ()
