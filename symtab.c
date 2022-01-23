@@ -38,6 +38,7 @@ void insert(char *name, int len, int type, int lineno){
 			/* set up entry */
 			l = (list_t*) malloc(sizeof(list_t));
 			strncpy(l->st_name, name, len);
+			l->st_size = len;
 			l->st_type = type;
 			l->scope = cur_scope;
 			l->lines = (RefList*) malloc(sizeof(RefList));
@@ -53,6 +54,7 @@ void insert(char *name, int len, int type, int lineno){
 			/* add it to check it again later */
 			l = (list_t*) malloc(sizeof(list_t));
 			strncpy(l->st_name, name, len);
+			l->st_size = len;
 			l->st_type = type;
 			l->scope = cur_scope;
 			l->lines = (RefList*) malloc(sizeof(RefList));
@@ -91,7 +93,8 @@ void insert(char *name, int len, int type, int lineno){
 			else{
 				/* set up entry */
 				l = (list_t*) malloc(sizeof(list_t));
-				strncpy(l->st_name, name, len);  
+				strncpy(l->st_name, name, len);
+				l->st_size = len;
 				l->st_type = type;
 				l->scope = cur_scope;
 				l->lines = (RefList*) malloc(sizeof(RefList));
