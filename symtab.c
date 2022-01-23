@@ -65,7 +65,7 @@ void insert(char *name, int len, int type, int lineno){
 			// printf("Inserted %s at line %d to check it again later!\n", name, lineno);
 			
 			/* Adding identifier to the revisit queue! */
-			add_to_queue(l->st_name, PARAM_CHECK);
+			add_to_queue(l, l->st_name, PARAM_CHECK);
 		}
 	}
 	/* found in table */
@@ -175,12 +175,12 @@ void set_type(char *name, int st_type, int inf_type){ // set the type of an entr
 	list_t *l = lookup(name);
 	
 	/* set as "main" type */
-	l->st_type = st_type;	
+	l->st_type = st_type;
 	
 	/* if array, pointer or function */
 	if(inf_type != UNDEF){
 		l->inf_type = inf_type;
-	}	
+	}
 }
 
 int get_type(char *name){ // get the type of an entry
@@ -231,7 +231,7 @@ Param def_param(int par_type, char *param_name, int passing){ // define paramete
 	/* set the information */
 	param.par_type = par_type;
 	strcpy(param.param_name, param_name);
-	param.passing = passing;
+	param.passing = passing;	
 	
 	/* return the structure */
 	return param;
@@ -292,13 +292,14 @@ int func_param_check(char *name, int num_of_pars, Param *parameters){ // check p
 
 // Revisit Queue Functions
 
-void add_to_queue(char *name, int type){ /* add to queue */
+void add_to_queue(list_t *entry, char *name, int type){ /* add to queue */
 	revisit_queue *q;
 	
 	/* queue is empty */
 	if(queue == NULL){
 		/* set up entry */
 		q = (revisit_queue*) malloc(sizeof(revisit_queue));
+		q->entry = entry;
 		q->st_name = name;
 		q->revisit_type = type;
 		q->next = NULL;
@@ -314,10 +315,21 @@ void add_to_queue(char *name, int type){ /* add to queue */
 		
 		/* add element to the end */
 		q->next = (revisit_queue*) malloc(sizeof(revisit_queue));
+		q->next->entry = entry;
 		q->next->st_name = name;
 		q->next->revisit_type = type;
 		q->next->next = NULL;
 	}		
+}
+
+revisit_queue *search_queue(char *name){ /* search queue */
+	revisit_queue *q;
+	
+	/* search for the entry */
+	q = queue;
+	while( strcmp(q->st_name, name) != 0 ) q = q->next;
+	
+	return q;
 }
 
 int revisit(char *name){ /* revisit entry by also removing it from queue */

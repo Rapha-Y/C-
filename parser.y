@@ -54,7 +54,7 @@
 /* token definition */
 %token<val> CHAR INT FLOAT DOUBLE IF ELSE WHILE FOR CONTINUE BREAK VOID RETURN
 %token<val> ADDOP MULOP DIVOP INCR OROP ANDOP NOTOP EQUOP RELOP
-%token<val> LPAREN RPAREN LBRACK RBRACK LBRACE RBRACE SEMI DOT COMMA ASSIGN REFER
+%token<val> LPAREN RPAREN LBRACK RBRACK LBRACE RBRACE SEMI COMMA ASSIGN REFER
 %token <symtab_item> ID
 %token <val> 	 ICONST
 %token <val>  	 FCONST
@@ -180,17 +180,10 @@ variable: ID { $$ = $1; }
 	}
 ;
 
-pointer: pointer MULOP | MULOP ; /* for now we suppose everything is a simple pointer! */
+pointer: MULOP ; /* for now only single pointers! */
 
-array: array LBRACK expression RBRACK
-	{ 
-	    // if declaration then error!
-		if(declare == 1){
-			fprintf(stderr, "Array declaration at %d contains expression!\n", lineno);
-			exit(1);
-		}
-	}
-	| LBRACK expression RBRACK
+array: /* for now only one-dimensional arrays */
+	LBRACK expression RBRACK /* can only be used in expressions */
 	{
 		// if declaration then error!
 		if(declare == 1){
@@ -484,6 +477,13 @@ assigment: var_ref ASSIGN expression
 {
 	AST_Node_Ref *temp = (AST_Node_Ref*) $1;
 	$$ = new_ast_assign_node(temp->entry, temp->ref, $3);
+	
+	// check assignment semantics
+	get_result_type(
+	    get_type(temp->entry->st_name), /* variable datatype */
+	    expression_data_type($3),       /* expression datatype */
+		NONE  /* checking compatibility only (no operator) */
+	);
 }
 ;
 
@@ -498,9 +498,22 @@ var_ref: variable
 ; 
 
 function_call: ID LPAREN call_params RPAREN
-{	
+{
 	AST_Node_Call_Params *temp = (AST_Node_Call_Params*) $3;
-	$$ = new_ast_func_call_node($1, temp->params, temp->num_of_pars);
+	$$ = new_ast_func_call_node($1, temp->params, temp->num_of_pars);	
+	
+	/* add information to revisit queue entry (if one exists) */
+	revisit_queue *q = search_queue($1->st_name);
+	if(q != NULL){
+		q->num_of_pars = temp->num_of_pars;
+		q->par_types = (int*) malloc(temp->num_of_pars * sizeof(int));
+		/* get the types of the parameters */
+		int i;
+		for(i = 0; i < temp->num_of_pars; i++){
+			/* get datatype of parameter-expression */
+			q->par_types[i] = expression_data_type(temp->params[i]);
+		}
+	}	
 }
 ;
 
@@ -562,6 +575,9 @@ functions:
 
 function: { incr_scope(); } function_head function_tail
 { 
+	/* TO DO: perform revisit */
+	// revisit(temp_function->entry->st_name);
+	
 	hide_scope();
 	$$ = (AST_Node *) temp_function;
 } 

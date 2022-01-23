@@ -65,11 +65,18 @@ typedef struct list_t{
 
 /* Queue of identifiers to revisit */
 typedef struct revisit_queue{
+	// symbol table entry
+	list_t *entry;
+	
 	// name of identifier
 	char *st_name;
 	
 	// type of revisit
 	int revisit_type;
+	
+	// parameters
+	int *par_types;
+	int num_of_pars;
 	
 	// maybe additional information to simplify the process ...
 		
@@ -105,6 +112,7 @@ int func_declare(char *name, int ret_type, int num_of_pars, Param *parameters); 
 int func_param_check(char *name, int num_of_pars, Param *parameters); // check parameters
 
 // Revisit Queue Functions
-void add_to_queue(char *name, int type); // add to queue
+void add_to_queue(list_t *entry, char *name, int type); // add to queue
+revisit_queue *search_queue(char *name); // search queue
 int revisit(char *name); // revisit entry by also removing it from queue
 void revisit_dump(FILE *of); // dump file
