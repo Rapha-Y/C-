@@ -85,7 +85,8 @@ extern int yydebug;
     ICONST = 291,
     FCONST = 292,
     CCONST = 293,
-    STRING = 294
+    STRING = 294,
+    MINUS = 295
   };
 #endif
 
@@ -109,7 +110,7 @@ union YYSTYPE
 	// for arrays
 	int array_size;
 
-#line 113 "parser.tab.h"
+#line 114 "parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

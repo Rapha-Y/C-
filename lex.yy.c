@@ -907,17 +907,17 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 YY_RULE_SETUP
 #line 34 "lexer.l"
-{ printf("Eat up comment at line %d\n", lineno); } 
+{ /* printf("Eat up comment at line %d\n", lineno); */ } 
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
 #line 36 "lexer.l"
-{ printf("Eat up comment from line %d ", lineno); BEGIN(ML_COMMENT); }
+{ /* printf("Eat up comment from line %d ", lineno); */ BEGIN(ML_COMMENT); }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
 #line 37 "lexer.l"
-{ printf("to line %d\n", lineno); BEGIN(INITIAL); }
+{ /* printf("to line %d\n", lineno); */ BEGIN(INITIAL); }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP

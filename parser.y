@@ -56,16 +56,16 @@
 %token <val>     STRING
 
 /* precedencies and associativities */
-%left LPAREN RPAREN LBRACK RBRACK
-%right NOTOP INCR REFER
-%left MULOP DIVOP
-%left ADDOP
-%left RELOP
-%left EQUOP
+%left COMMA
+%right ASSIGN
 %left OROP
 %left ANDOP
-%right ASSIGN
-%left COMMA
+%left EQUOP
+%left RELOP
+%left ADDOP
+%left MULOP DIVOP
+%right NOTOP INCR REFER MINUS
+%left LPAREN RPAREN LBRACK RBRACK
 
 /* rule (non-terminal) definitions */
 %type <node> program
@@ -76,10 +76,10 @@
 %type <symtab_item> init var_init array_init
 %type <node> constant
 %type <node> expression var_ref
-%type <val> sign
 %type <node> statement assigment
 %type <node> statements tail
 %type <node> if_statement else_if optional_else
+%type <node> for_statement while_statement
 
 %start program
 
@@ -238,8 +238,14 @@ statement:
 	{ 
 		$$ = $1; /* just pass information */
 	}
-	| for_statement { $$ = NULL; /* will do it later ! */ }
-	| while_statement { $$ = NULL; /* will do it later ! */ }
+	| for_statement
+	{ 
+		$$ = $1; /* just pass information */
+	}
+	| while_statement
+	{
+		$$ = $1; /* just pass information */
+	}
 	| assigment SEMI
 	{
 		$$ = $1; /* just pass information */
@@ -314,14 +320,31 @@ optional_else:
 	}
 ;
 
-for_statement: FOR LPAREN assigment SEMI expression SEMI expression RPAREN tail ;
+for_statement: FOR LPAREN assigment SEMI expression SEMI ID INCR RPAREN tail
+{
+	/* create increment node*/
+	AST_Node *incr_node;
+	if($8.ival == INC){ /* increment */
+		incr_node = new_ast_incr_node($7, 0, 0);
+	}
+	else{
+		incr_node = new_ast_incr_node($7, 1, 0);
+	}
 
-while_statement: WHILE LPAREN expression RPAREN tail ;
+	$$ = new_ast_for_node($3, $5, incr_node, $10);
+	set_loop_counter($$);
+}
+;
+
+while_statement: WHILE LPAREN expression RPAREN tail
+{
+	$$ = new_ast_while_node($3, $5);
+}
+;
 
 tail: LBRACE statements RBRACE
 { 
 	$$ = $2; /* just pass information */
-	ast_traversal($2);
 }
 ;
 
@@ -386,10 +409,18 @@ expression:
 	{ 
 		$$ = $1; /* just pass information */
 	}
-	| sign constant
+	| constant
 	{
-		/* sign */
-		if($1.ival == 1){
+		$$ = $1; /* no sign */
+	}
+	| ADDOP constant %prec MINUS
+	{
+		/* plus sign error */
+		if($1.ival == ADD){
+			fprintf(stderr, "Error having plus as a sign!\n");
+			exit(1);
+		}
+		else{
 			AST_Node_Const *temp = (AST_Node_Const*) $2;
 		
 			/* inverse value depending on the constant type */
@@ -409,32 +440,11 @@ expression:
 			
 			$$ = (AST_Node*) temp;
 		}
-		/* no sign */
-		else{
-			$$ = $2;
-		}
 	}
 	| function_call
 	{
 		$$ = NULL; /* will do it later ! */
 	}
-;
-
-sign: ADDOP
-	{ 
-		/* plus sign error */
-		if($1.ival == ADD){
-			fprintf(stderr, "Error having plus as a sign!\n");
-			exit(1);
-		}
-		else{
-			$$.ival = 1; /* sign */
-		}
-	}
-	| /* empty */
-	{ 
-		$$.ival = 0; /* no sign */
-	} 
 ;
 
 constant:

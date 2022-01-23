@@ -136,6 +136,9 @@ typedef struct AST_Node_For{
 	
 	// branch
 	struct AST_Node *for_branch;
+	
+	// loop counter
+	list_t *counter;
 }AST_Node_For;
 
 typedef struct AST_Node_While{
@@ -279,6 +282,7 @@ AST_Node *new_ast_if_node(AST_Node *condition, AST_Node *if_branch, AST_Node **e
 	int elseif_count, AST_Node *else_branch);
 AST_Node *new_ast_elsif_node(AST_Node *condition, AST_Node *elsif_branch);
 AST_Node *new_ast_for_node(AST_Node *initialize, AST_Node *condition, AST_Node *increment, AST_Node *for_branch);
+void set_loop_counter(AST_Node *node);
 AST_Node *new_ast_while_node(AST_Node *condition, AST_Node *while_branch);
 AST_Node *new_ast_assign_node(list_t *entry, int ref, AST_Node *assign_val);
 AST_Node *new_ast_simple_node(int statement_type);							 // continue or break
