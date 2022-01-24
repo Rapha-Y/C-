@@ -74,17 +74,19 @@ typedef struct revisit_queue{
 	// type of revisit
 	int revisit_type;
 	
-	// parameters
-	int *par_types;
-	int num_of_pars;
+	// parameters of function calls
+	int **par_types;
+	int *num_of_pars;
+	int num_of_calls;
 	
 	// maybe additional information to simplify the process ...
-		
+	
 	struct revisit_queue *next;
 }revisit_queue;
 
 /* revisit types */
-#define PARAM_CHECK 1 /* Check parameters of function call when functions gets declared */
+#define PARAM_CHECK 1  /* Check parameters of function call when functions gets declared */
+#define ASSIGN_CHECK 2 /* Check assignment when function call part of the expression */
 
 /* static structures */
 static list_t **hash_table;
@@ -109,10 +111,11 @@ void incr_scope(); // go to next scope
 // Function Declaration and Parameters
 Param def_param(int par_type, char *param_name, int passing); // define parameter
 int func_declare(char *name, int ret_type, int num_of_pars, Param *parameters); // declare function
-int func_param_check(char *name, int num_of_pars, Param *parameters); // check parameters
+int func_param_check(char *name, int num_of_calls, int** par_types, int *num_of_pars); // check parameters
 
 // Revisit Queue Functions
 void add_to_queue(list_t *entry, char *name, int type); // add to queue
 revisit_queue *search_queue(char *name); // search queue
+revisit_queue *search_prev_queue(char *name); // search previous of element
 int revisit(char *name); // revisit entry by also removing it from queue
 void revisit_dump(FILE *of); // dump file

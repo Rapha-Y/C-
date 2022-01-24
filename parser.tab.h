@@ -77,16 +77,15 @@ extern int yydebug;
     LBRACE = 283,
     RBRACE = 284,
     SEMI = 285,
-    DOT = 286,
-    COMMA = 287,
-    ASSIGN = 288,
-    REFER = 289,
-    ID = 290,
-    ICONST = 291,
-    FCONST = 292,
-    CCONST = 293,
-    STRING = 294,
-    MINUS = 295
+    COMMA = 286,
+    ASSIGN = 287,
+    REFER = 288,
+    ID = 289,
+    ICONST = 290,
+    FCONST = 291,
+    CCONST = 292,
+    STRING = 293,
+    MINUS = 294
   };
 #endif
 
@@ -113,7 +112,7 @@ union YYSTYPE
 	// for parameters
 	Param par;
 
-#line 117 "parser.tab.h"
+#line 116 "parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
