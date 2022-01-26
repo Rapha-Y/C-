@@ -61,11 +61,7 @@ var: ID | ID LBRACK expression RBRACK;
 
 simple-expression: sum-expression relational sum-expression | sum-expression;
 
-<<<<<<< HEAD
-relational: LESS | LESSEQ | MORE | MOREEQ | EQUALS | NOTEQUALS;
-=======
 relational: LTE | LT | GT | GTE | EQ | DIFF;
->>>>>>> reboot
 
 sum-expression: sum-expression sum term | term;
 
