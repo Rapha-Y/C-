@@ -11,7 +11,7 @@
 %}
 
 %token ELSE IF INT RETURN VOID WHILE
-%token ADD MUL COMP ASSIGN SEMI COMMA LPAR RPAR LBRACK RBRACK LBRACE RBRACE
+%token ADD SUB MUL DIV LESS LESSEQ MORE MOREEQ EQUALS NOTEQUALS ASSIGN SEMI COMMA LPAR RPAR LBRACK RBRACK LBRACE RBRACE
 %token ID NUM
 
 %start program
@@ -58,15 +58,17 @@ var: ID | ID LBRACK expression RBRACK;
 
 simple-expression: sum-expression relational sum-expression | sum-expression;
 
-relational: COMP;
+relational: LESS | LESSEQ | MORE | MOREEQ | EQUALS | NOTEQUALS;
 
 sum-expression: sum-expression sum term | term;
 
-sum: ADD;
+sum: ADD | SUB;
 
 term: term mult factor | factor;
 
 mult: MUL;
+
+div: DIV;
 
 factor: LPAR expression RPAR | var | activation | NUM;
 
