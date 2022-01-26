@@ -7,7 +7,6 @@
     #include "symtab.h"
     #include "parser.tab.h"
     int lineno = 1;
-    void ret_print(char *token_type);
     void yyerror();  
 %}
 
@@ -41,12 +40,12 @@ NUM {digit}+
 "-" 	    { return SUB; }
 "*" 	    { return MUL; }
 "/" 	    { return DIV; }
-"<" 	    { return LESS; }
-"<=" 	    { return LESSEQ; }
-">" 	    { return MORE; }
-">=" 	    { return MOREEQ; }
-"==" 	    { return EQUALS; }
-"!=" 	    { return NOTEQUALS; }
+"<" 	    { return LT; }
+"<=" 	    { return LTE; }
+">" 	    { return GT; }
+">=" 	    { return GTE; }
+"==" 	    { return EQ; }
+"!=" 	    { return DIFF; }
 "=" 	    { return ASSIGN; }
 ";" 	    { return SEMI; }
 "," 	    { return COMMA; }
@@ -64,8 +63,8 @@ NUM {digit}+
 }
 {NUM} { return NUM; }
 
-"\n" { lineno += 1; }
 [ \t]+
+"\n" { lineno += 1; }
 
 . { yyerror("Unrecognized character"); }
 

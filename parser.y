@@ -11,7 +11,10 @@
 %}
 
 %token ELSE IF INT RETURN VOID WHILE
-%token ADD SUB MUL DIV LESS LESSEQ MORE MOREEQ EQUALS NOTEQUALS ASSIGN SEMI COMMA LPAR RPAR LBRACK RBRACK LBRACE RBRACE
+%token ADD SUB MULT DIV
+%token LT LTE GT GTE EQ DIFF
+%token ASSIGN SEMI COMMA 
+%token LPAR RPAR LBRACK RBRACK LBRACE RBRACE
 %token ID NUM
 
 %start program
@@ -24,7 +27,7 @@ declaration-list: declaration-list declaration | declaration;
 
 declaration: var-declaration | fun-declaration;
 
-var-declaration: type-specifier ID ; | type-specifier ID LBRACK NUM RBRACK;
+var-declaration: type-specifier ID SEMI | type-specifier ID LBRACK NUM RBRACK SEMI;
 
 type-specifier: INT | VOID;
 
@@ -58,7 +61,11 @@ var: ID | ID LBRACK expression RBRACK;
 
 simple-expression: sum-expression relational sum-expression | sum-expression;
 
+<<<<<<< HEAD
 relational: LESS | LESSEQ | MORE | MOREEQ | EQUALS | NOTEQUALS;
+=======
+relational: LTE | LT | GT | GTE | EQ | DIFF;
+>>>>>>> reboot
 
 sum-expression: sum-expression sum term | term;
 
@@ -66,7 +73,7 @@ sum: ADD | SUB;
 
 term: term mult factor | factor;
 
-mult: MUL;
+mult: MULT | DIV;
 
 div: DIV;
 
