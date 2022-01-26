@@ -9,7 +9,7 @@
 typedef struct Param {
     int par_type;
     char param_name[MAXTOKENLEN];
-    int ival; double fval; char *st_sval;
+    int ival;
 } Param;
 
 typedef struct RefList {
@@ -24,10 +24,10 @@ typedef struct list_t {
     int st_size;
     int scope;
     RefList *lines;
-    int st_ival; double st_fval; char *st_sval;
+    int st_ival;
     int st_type;
     int inf_type;
-    int *i_vals; double *f_vals; char **s_vals;
+    int *i_vals;
     int array_size;
     Param *parameters;
     int num_of_pars;
