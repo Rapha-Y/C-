@@ -27,7 +27,7 @@ declaration-list: declaration-list declaration | declaration;
 
 declaration: var-declaration | fun-declaration;
 
-var-declaration: type-specifier ID ; | type-specifier ID LBRACK NUM RBRACK;
+var-declaration: type-specifier ID SEMI | type-specifier ID LBRACK NUM RBRACK SEMI;
 
 type-specifier: INT | VOID;
 
