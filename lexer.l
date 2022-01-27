@@ -3,8 +3,13 @@
 %{
     #include <stdio.h>
     #include <stdlib.h>
-    #include <string.h> 
-    int lineno = 1;
+    #include <string.h>
+    #include "symtab.c"
+
+    extern FILE *yyin;
+    extern FILE *yyout;
+
+    int line = 1;
     void ret_print(char *token_type);
     void yyerror();  
 %}
@@ -19,11 +24,11 @@ NUM {digit}+
 
 %%
 
-"/*" { printf("Comments starts at line %d ", lineno); BEGIN(ML_COMMENT); }
-<ML_COMMENT>"*/" { printf("and ends at line %d\n", lineno); BEGIN(INITIAL); }
+"/*" { printf("Comments starts at line %d ", line); BEGIN(ML_COMMENT); }
+<ML_COMMENT>"*/" { printf("and ends at line %d\n", line); BEGIN(INITIAL); }
 <ML_COMMENT>[^*\n]+
 <ML_COMMENT>"*"
-<ML_COMMENT>"\n" { lineno += 1; }
+<ML_COMMENT>"\n" { line += 1; }
 
 "else" { ret_print("KEYWORD_ELSE"); }
 "if" { ret_print("KEYWORD_IF"); }
@@ -52,28 +57,38 @@ NUM {digit}+
 "{" { ret_print("LBRACE"); }
 "}" { ret_print("RBRACE"); }
 
-{ID} { ret_print("ID"); }
+{ID} { 
+    insert_token(yytext, strlen(yytext), UNDEF, line);
+    ret_print("ID"); 
+}
 {NUM} { ret_print("NUM"); }
 
 [ \t]+
-"\n" { lineno += 1; }
+"\n" { line += 1; }
 
 . { yyerror("Lexical error"); }
 
 %%
 
 void ret_print(char *token_type) {
-    printf("yytext: %s\ttoken: %s\tlineno: %d\n", yytext, token_type, lineno);
+    printf("yytext: %s\ttoken: %s\tline: %d\n", yytext, token_type, line);
 }
 
 void yyerror(char *message) {
-    printf("Error: \"%s\" in line %d. Token = %s\n", message, lineno, yytext);
+    printf("Error: \"%s\" in line %d. Token = %s\n", message, line, yytext);
     exit(1);
 }
 
 int main(int argc, char *argv[]) {
+    init_table();
+    
     yyin = fopen(argv[1], "r");
     yylex();
     fclose(yyin);
+
+    yyout = fopen("symtab_dump.out", "w");
+    symtab_dump(yyout);
+    fclose(yyout);
+
     return 0;
 }
