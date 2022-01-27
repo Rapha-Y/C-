@@ -32,9 +32,16 @@ NUM {digit}+
 "void" { ret_print("KEYWORD_VOID"); }
 "while" { ret_print("KEYWORD_WHILE"); }
 
-"+"|"-" { ret_print("ADD"); }
-"*"|"/" { ret_print("MUL"); }
-"<"|"<="|">"|">="|"=="|"!=" { ret_print("COMP"); }
+"+" { ret_print("ADD"); }
+"-" { ret_print("SUB"); }
+"*" { ret_print("MULT"); }
+"/" { ret_print("DIV"); }
+"<" { ret_print("LT"); }
+"<=" { ret_print("LTE"); }
+">" { ret_print("GT"); }
+">=" { ret_print("GTE"); }
+"==" { ret_print("EQ"); }
+"!=" { ret_print("DIFF"); }
 "=" { ret_print("ASSIGN"); }
 ";" { ret_print("SEMI"); }
 "," { ret_print("COMMA"); }
@@ -48,10 +55,10 @@ NUM {digit}+
 {ID} { ret_print("ID"); }
 {NUM} { ret_print("NUM"); }
 
-"\n" { lineno += 1; }
 [ \t]+
+"\n" { lineno += 1; }
 
-. { yyerror("Unrecognized character"); }
+. { yyerror("Lexical error"); }
 
 %%
 
