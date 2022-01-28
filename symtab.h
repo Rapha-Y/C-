@@ -1,11 +1,7 @@
+#include "semantics.h"
+
 #define SIZE 256
 #define MAXTOKENLEN 64
-
-#define UNDEF 0
-#define VOID_TYPE 1
-#define INT_TYPE 2
-#define ARRAY_TYPE 3
-#define FUNCTION_TYPE 4
 
 typedef struct Param {
     int type;

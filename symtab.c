@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "semantics.h"
 #include "symtab.h"
 
 void init_table() {
