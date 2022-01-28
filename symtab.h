@@ -36,6 +36,7 @@ typedef struct Token {
 static Token **h_table;
 
 void init_table();
+unsigned int hash(char *key);
 void insert_token(char *name, int len, int type, int line);
 Token *search_token(char *name);
 void symtab_dump(FILE *of); 

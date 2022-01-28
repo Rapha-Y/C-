@@ -3,7 +3,6 @@
 #include <string.h>
 #include "symtab.h"
 
-// create hash table
 void init_table() {
     h_table = malloc(SIZE * sizeof(Token*));
     for(int i = 0; i < SIZE; i++) h_table[i] = NULL;

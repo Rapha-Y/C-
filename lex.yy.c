@@ -487,13 +487,13 @@ char *yytext;
     #include <stdio.h>
     #include <stdlib.h>
     #include <string.h>
-    #include "symtab.c"
+    #include "symtab.h"
+    #include "parser.tab.h"
 
     extern FILE *yyin;
     extern FILE *yyout;
 
     int line = 1;
-    void ret_print(char *token_type);
     void yyerror();  
 #line 499 "lex.yy.c"
 
@@ -804,140 +804,140 @@ YY_RULE_SETUP
 case 6:
 YY_RULE_SETUP
 #line 33 "lexer.l"
-{ ret_print("KEYWORD_ELSE"); }
+{ return ELSE; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
 #line 34 "lexer.l"
-{ ret_print("KEYWORD_IF"); }
+{ return IF; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
 #line 35 "lexer.l"
-{ ret_print("KEYWORD_INT"); }
+{ return INT; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
 #line 36 "lexer.l"
-{ ret_print("KEYWORD_RETURN"); }
+{ return RETURN; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
 #line 37 "lexer.l"
-{ ret_print("KEYWORD_VOID"); }
+{ return VOID; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
 #line 38 "lexer.l"
-{ ret_print("KEYWORD_WHILE"); }
+{ return WHILE; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
 #line 40 "lexer.l"
-{ ret_print("ADD"); }
+{ return ADD; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
 #line 41 "lexer.l"
-{ ret_print("SUB"); }
+{ return SUB; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
 #line 42 "lexer.l"
-{ ret_print("MULT"); }
+{ return MULT; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
 #line 43 "lexer.l"
-{ ret_print("DIV"); }
+{ return DIV; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
 #line 44 "lexer.l"
-{ ret_print("LT"); }
+{ return LT; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
 #line 45 "lexer.l"
-{ ret_print("LTE"); }
+{ return LTE; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
 #line 46 "lexer.l"
-{ ret_print("GT"); }
+{ return GT; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
 #line 47 "lexer.l"
-{ ret_print("GTE"); }
+{ return GTE; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
 #line 48 "lexer.l"
-{ ret_print("EQ"); }
+{ return EQ; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
 #line 49 "lexer.l"
-{ ret_print("DIFF"); }
+{ return DIFF; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
 #line 50 "lexer.l"
-{ ret_print("ASSIGN"); }
+{ return ASSIGN; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
 #line 51 "lexer.l"
-{ ret_print("SEMI"); }
+{ return SEMI; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
 #line 52 "lexer.l"
-{ ret_print("COMMA"); }
+{ return COMMA; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
 #line 53 "lexer.l"
-{ ret_print("LPAR"); }
+{ return LPAR; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
 #line 54 "lexer.l"
-{ ret_print("RPAR"); }
+{ return RPAR; }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
 #line 55 "lexer.l"
-{ ret_print("LBRACK"); }
+{ return LBRACK; }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
 #line 56 "lexer.l"
-{ ret_print("RBRACK"); }
+{ return RBRACK; }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
 #line 57 "lexer.l"
-{ ret_print("LBRACE"); }
+{ return LBRACE; }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
 #line 58 "lexer.l"
-{ ret_print("RBRACE"); }
+{ return RBRACE; }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
 #line 60 "lexer.l"
 { 
     insert_token(yytext, strlen(yytext), UNDEF, line);
-    ret_print("ID"); 
+    return ID; 
 }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
 #line 64 "lexer.l"
-{ ret_print("NUM"); }
+{ return NUM; }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
@@ -953,7 +953,7 @@ YY_RULE_SETUP
 case 35:
 YY_RULE_SETUP
 #line 69 "lexer.l"
-{ yyerror("Lexical error"); }
+{ yyerror("Lexical error at line %d\n", line); }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
@@ -1968,26 +1968,3 @@ void yyfree (void * ptr )
 
 #line 71 "lexer.l"
 
-
-void ret_print(char *token_type) {
-    printf("yytext: %s\ttoken: %s\tline: %d\n", yytext, token_type, line);
-}
-
-void yyerror(char *message) {
-    printf("Error: \"%s\" in line %d. Token = %s\n", message, line, yytext);
-    exit(1);
-}
-
-int main(int argc, char *argv[]) {
-    init_table();
-    
-    yyin = fopen(argv[1], "r");
-    yylex();
-    fclose(yyin);
-
-    yyout = fopen("symtab_dump.out", "w");
-    symtab_dump(yyout);
-    fclose(yyout);
-
-    return 0;
-}
