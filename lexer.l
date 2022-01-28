@@ -59,9 +59,13 @@ NUM {digit}+
 
 {ID} { 
     insert_token(yytext, strlen(yytext), UNDEF, line);
+    yylval.symtab_token = search_token(yytext);
     return ID; 
 }
-{NUM} { return NUM; }
+{NUM} { 
+    yylval.i_val = atoi(yytext);
+    return NUM; 
+}
 
 [ \t]+
 "\n" { line += 1; }

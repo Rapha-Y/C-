@@ -12,12 +12,18 @@
 	void yyerror();
 %}
 
-%token ELSE IF INT RETURN VOID WHILE
-%token ADD SUB MULT DIV
-%token LT LTE GT GTE EQ DIFF
-%token ASSIGN SEMI COMMA 
-%token LPAR RPAR LBRACK RBRACK LBRACE RBRACE
-%token ID NUM
+%union{
+    int i_val;
+    Token* symtab_token;
+}
+
+%token<i_val> ELSE IF INT RETURN VOID WHILE
+%token<i_val> ADD SUB MULT DIV
+%token<i_val> LT LTE GT GTE EQ DIFF
+%token<i_val> ASSIGN SEMI COMMA 
+%token<i_val> LPAR RPAR LBRACK RBRACK LBRACE RBRACE
+%token<symtab_token> ID 
+%token<i_val> NUM
 
 %start program
 

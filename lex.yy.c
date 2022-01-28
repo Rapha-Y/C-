@@ -931,36 +931,40 @@ YY_RULE_SETUP
 #line 60 "lexer.l"
 { 
     insert_token(yytext, strlen(yytext), UNDEF, line);
+    yylval.symtab_token = search_token(yytext);
     return ID; 
 }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 64 "lexer.l"
-{ return NUM; }
+#line 65 "lexer.l"
+{ 
+    yylval.i_val = atoi(yytext);
+    return NUM; 
+}
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 66 "lexer.l"
+#line 70 "lexer.l"
 
 	YY_BREAK
 case 34:
 /* rule 34 can match eol */
 YY_RULE_SETUP
-#line 67 "lexer.l"
+#line 71 "lexer.l"
 { line += 1; }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 69 "lexer.l"
+#line 73 "lexer.l"
 { yyerror("Lexical error at line %d\n", line); }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 71 "lexer.l"
+#line 75 "lexer.l"
 ECHO;
 	YY_BREAK
-#line 964 "lex.yy.c"
+#line 968 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(ML_COMMENT):
 	yyterminate();
@@ -1966,5 +1970,5 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 71 "lexer.l"
+#line 75 "lexer.l"
 
