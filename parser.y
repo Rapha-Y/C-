@@ -1,4 +1,6 @@
 %{
+	#include "ast.h"
+	#include "ast.c"
     #include "semantics.c"
 	#include "symtab.c"
 	#include <stdio.h>
@@ -16,6 +18,7 @@
 %union{
     int i_val;
     Token* symtab_token;
+	AST_node* node;
 }
 
 %token<i_val> ELSE IF INT RETURN VOID WHILE
