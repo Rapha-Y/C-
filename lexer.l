@@ -3,10 +3,10 @@
 %{
     #include <stdio.h>
     #include <stdlib.h>
-    #include <string.h>
-    #include "ast.h"
-    #include "semantics.h"
+    #include <string.h>    
     #include "symtab.h"
+    #include "semantics.h"
+    #include "ast.h"
     #include "parser.tab.h"
 
     extern FILE *yyin;
@@ -65,7 +65,7 @@ NUM {digit}+
     return ID; 
 }
 {NUM} { 
-    yylval.i_val = atoi(yytext);
+    yylval.val.i_val = atoi(yytext);
     return NUM; 
 }
 

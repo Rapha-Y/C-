@@ -50,23 +50,26 @@ Token *search_token(char *name) {
 }
 
 void symtab_dump(FILE *of) {
-    fprintf(of, "------------ ------ ------------\n");
-    fprintf(of, "Name         Type   Line Numbers\n");
-    fprintf(of, "------------ ------ -------------\n");
+    fprintf(of,"------------ -------------- ------ ------------\n");
+    fprintf(of,"Name         Type           Scope  Line Numbers\n");
+    fprintf(of,"------------ -------------- ------ ------------\n");
     for (int i = 0; i < SIZE; ++i) {
         if (h_table[i] != NULL) {
             Token *token = h_table[i];
             while(token != NULL) {
                 Occur *occur = token->first;
-                fprintf(of,"%-12s ", token->name);
-                if(token->type == INT_TYPE) fprintf(of, "%-7s","int");
-                else if(token->type == ARRAY_TYPE) fprintf(of, "array of int");
-                else if(token->type == FUNCTION_TYPE) {
+                fprintf(of,"%-13s ", token->name);
+                if(token->type == VOID_TYPE) fprintf(of, "%-15s", "void");
+                else if(token->type == INT_TYPE) fprintf(of, "%-15s", "int");
+                else if(token->type == ARRAY_TYPE) {
+                    fprintf(of, "array of ");
+                    fprintf(of, "%-6s", "int");
+                } else if(token->type == FUNCTION_TYPE) {
                     fprintf(of, "function returns ");
-                    if(token->ret_type == VOID_TYPE) fprintf(of, "%-7s","nothing");
-                    else if(token->ret_type == INT_TYPE) fprintf(of, "%-7s","int");
-                    else fprintf(of, "%-7s","undef");              
-                } else fprintf(of,"%-7s","undef");
+                    if(token->ret_type == VOID_TYPE) fprintf(of, "%-6s", "void");
+                    else if(token->ret_type == INT_TYPE) fprintf(of, "%-6s", "int");
+                    else fprintf(of, "%-4s","undef");              
+                } else fprintf(of,"%-15s","undef");
                 while(occur != NULL) {
                     fprintf(of, "%4d ", occur->line);
                     occur = occur->next;

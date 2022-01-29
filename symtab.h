@@ -3,11 +3,15 @@
 #define SIZE 256
 #define MAXTOKENLEN 64
 
+typedef struct Value {
+    int i_val;
+} Value;
+
 typedef struct Param {
     int type;
     char name[MAXTOKENLEN];
-    int i_val;
-    int *arr_vals;
+    Value val;
+    Value *vals;
     int arr_size;
 } Param;
 
@@ -19,8 +23,8 @@ typedef struct Occur {
 typedef struct Token {
     int type;
     char name[MAXTOKENLEN];
-    int i_val;
-    int *arr_vals;
+    Value val;
+    Value *vals;
     int arr_size;
     int ret_type;
     Param *params;
