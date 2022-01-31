@@ -2,8 +2,10 @@
 Project for the Compilers discipline.
 
 # Commands
-flex lexer.l
+bison -d parser.y
 
-gcc lex.yy.c -o lexer
+flex scanner.l
 
-./lexer example.c
+gcc -o scanner parser.tab.c lex.yy.c
+
+./scanner example.c
