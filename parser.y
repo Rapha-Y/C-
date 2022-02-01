@@ -12,12 +12,18 @@
     void yyerror();
 %}
 
+%union{
+	int int_val;
+	char *str_val;
+}
+
 %token ELSE IF INT RETURN VOID WHILE
 %token ADD SUB MUL DIV
 %token LT LTE GT GTE EQ DIF
 %token ASSIGN SEMI COMMA 
 %token LPAR RPAR LBRACK RBRACK LBRACE RBRACE
-%token ID NUM
+%token<str_val> ID 
+%token<int_val> NUM
 
 %start program
 
@@ -49,20 +55,16 @@ declaration:
 
 var-declaration: 
 	type-specifier ID SEMI {
-		char str1[14] = "ID(";
-		char str2[10];
-		sprintf(str2, "%d", $2);
-		strcat(str1, str2);
+		char str1[64] = "ID(";
+		strcat(str1, $2);
 		strcat(str1, ")");
 		insert_syn_tree(str1, 0);
 		insert_syn_tree(";", 0);
 		insert_syn_tree("var-declaration", 3);
 	} | 
 	type-specifier ID LBRACK NUM RBRACK SEMI {
-		char str1[14] = "ID(";
-		char str2[10];
-		sprintf(str2, "%d", $2);
-		strcat(str1, str2);
+		char str1[64] = "ID(";
+		strcat(str1, $2);
 		strcat(str1, ")");
 		insert_syn_tree(str1, 0);
 		insert_syn_tree("[", 0);
@@ -91,10 +93,8 @@ type-specifier:
 
 fun-declaration: 
 	type-specifier ID LPAR {
-		char str1[14] = "ID(";
-		char str2[10];
-		sprintf(str2, "%d", $2);
-		strcat(str1, str2);
+		char str1[64] = "ID(";
+		strcat(str1, $2);
 		strcat(str1, ")");
 		insert_syn_tree(str1, 0);
 		insert_syn_tree("(", 0);
@@ -128,19 +128,15 @@ param-list:
 
 param: 
 	type-specifier ID {
-		char str1[14] = "ID(";
-		char str2[10];
-		sprintf(str2, "%d", $2);
-		strcat(str1, str2);
+		char str1[64] = "ID(";
+		strcat(str1, $2);
 		strcat(str1, ")");
 		insert_syn_tree(str1, 0);
 		insert_syn_tree("param", 2);
 	} | 
 	type-specifier ID LBRACK RBRACK {
-		char str1[14] = "ID(";
-		char str2[10];
-		sprintf(str2, "%d", $2);
-		strcat(str1, str2);
+		char str1[64] = "ID(";
+		strcat(str1, $2);
 		strcat(str1, ")");
 		insert_syn_tree(str1, 0);
 		insert_syn_tree("[", 0);
@@ -257,19 +253,15 @@ expression:
 
 var: 
 	ID {
-		char str1[14] = "ID(";
-		char str2[10];
-		sprintf(str2, "%d", $1);
-		strcat(str1, str2);
+		char str1[64] = "ID(";
+		strcat(str1, $1);
 		strcat(str1, ")");
 		insert_syn_tree(str1, 0);
 		insert_syn_tree("var", 1);
 	} | 
 	ID LBRACK {
-		char str1[14] = "ID(";
-		char str2[10];
-		sprintf(str2, "%d", $1);
-		strcat(str1, str2);
+		char str1[64] = "ID(";
+		strcat(str1, $1);
 		strcat(str1, ")");
 		insert_syn_tree(str1, 0);
 		insert_syn_tree("[", 0);
@@ -382,10 +374,8 @@ factor:
 
 activation: 
 	ID LPAR {
-		char str1[14] = "ID(";
-		char str2[10];
-		sprintf(str2, "%d", $1);
-		strcat(str1, str2);
+		char str1[64] = "ID(";
+		strcat(str1, $1);
 		strcat(str1, ")");
 		insert_syn_tree(str1, 0);
 		insert_syn_tree("(", 0);

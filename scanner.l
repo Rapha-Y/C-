@@ -60,8 +60,8 @@ NUM {digit}+
 "{" { print_token("LBRACE"); return LBRACE; }
 "}" { print_token("RBRACE"); return RBRACE; }
 
-{ID} { print_token("ID"); return ID; }
-{NUM} { print_token("NUM"); return NUM; }
+{ID} { yylval.str_val = malloc(yyleng * sizeof(char)); strcpy(yylval.str_val, yytext); print_token("ID"); return ID; }
+{NUM} { yylval.int_val = atoi(yytext); print_token("NUM"); return NUM; }
 
 [ \t]+
 "\n" { line += 1; }
