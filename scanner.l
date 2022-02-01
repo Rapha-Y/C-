@@ -71,21 +71,21 @@ NUM {digit}+
 %%
 
 void open_comm() {
-    printf("Comentário da linha %d ", line); 
+    //printf("Comentário da linha %d ", line); 
     BEGIN(ML_COMMENT);
 };
 
 void close_comm() {
-    printf("até a linha %d\n", line);
+    //printf("até a linha %d\n", line);
     BEGIN(INITIAL);
 };
 
 void print_token(char *token) {
-    printf("Token: %s\tLexema: %s\tNúmero da linha: %d\n", token, yytext, line);
+    //printf("Token: %s\tLexema: %s\tNúmero da linha: %d\n", token, yytext, line);
 }
 
 void lex_error() {
-    printf("ERRO LÉXICO: Lexema: %s\tNúmero da linha: %d\n", yytext, line);
+    //printf("ERRO LÉXICO: Lexema: %s\tNúmero da linha: %d\n", yytext, line);
     exit(1);
 }
 
