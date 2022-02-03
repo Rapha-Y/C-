@@ -49,7 +49,7 @@ void insert_syn_tree(char *value, int child_num) {
 
 void print_subtree(Syn_tree_node *node, int tab_num) {
     for(int i = 0; i < tab_num; i++) {
-        printf("\t");
+        printf("    ");
     }
     printf("%s\n", node->value);
     

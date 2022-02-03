@@ -198,6 +198,9 @@ expression-decl:
 ;
 
 selection-decl: 
+	if-decl {
+		insert_syn_tree("selection-decl", 5);
+	} |
 	if-decl ELSE {
 		insert_syn_tree("else", 0);
 	} statement {
@@ -407,7 +410,7 @@ arg-list:
 
 //find way to find the token, maybe using the tree
 void yyerror() { 
-    printf("ERRO SINTÁTICO: Número da linha: %d\n", line); 
+    printf("ERRO SINTÁTICO:\tNúmero da linha: %d\n", line);
     exit(1);
 };
 
@@ -419,7 +422,7 @@ int main(int argc, char *argv[]) {
 	flag = yyparse();
 	fclose(yyin);
 
-	void print_tree();
+	print_tree();
 
 	return flag;
 }
