@@ -410,7 +410,95 @@ arg-list:
 
 //find way to find the token, maybe using the tree
 void yyerror() { 
-    printf("ERRO SINTÁTICO:\tNúmero da linha: %d\n", line);
+    printf("ERRO SINTÁTICO:\tToken: ");
+
+	char token[128] = "";
+	switch(yychar) {
+		case ELSE:
+			strcat(token, "else");
+			break;
+		case IF:
+			strcat(token, "if");
+			break;
+		case INT:
+			strcat(token, "int");
+			break;
+		case RETURN:
+			strcat(token, "return");
+			break;
+		case VOID:
+			strcat(token, "void");
+			break;
+		case WHILE:
+			strcat(token, "while");
+			break;
+		case ADD:
+			strcat(token, "+");
+			break;
+		case SUB:
+			strcat(token, "-");
+			break;
+		case MUL:
+			strcat(token, "*");
+			break;
+		case DIV:
+			strcat(token, "/");
+			break;
+		case LT:
+			strcat(token, "<");
+			break;
+		case LTE:
+			strcat(token, "<=");
+			break;
+		case GT:
+			strcat(token, ">");
+			break;
+		case GTE:
+			strcat(token, ">=");
+			break;
+		case EQ:
+			strcat(token, "==");
+			break;
+		case DIF:
+			strcat(token, "!=");
+			break;
+		case ASSIGN:
+			strcat(token, "=");
+			break;
+		case SEMI:
+			strcat(token, ";");
+			break;
+		case COMMA:
+			strcat(token, ",");
+			break;
+		case LPAR:
+			strcat(token, "(");
+			break;
+		case RPAR:
+			strcat(token, ")");
+			break;
+		case LBRACK:
+			strcat(token, "[");
+			break;
+		case RBRACK:
+			strcat(token, "]");
+			break;
+		case LBRACE:
+			strcat(token, "{");
+			break;
+		case RBRACE:
+			strcat(token, "}");
+			break;
+		case ID:
+			strcat(token, "ID");
+			break;
+		case NUM:
+			strcat(token, "NUM");
+			break;
+	}
+	printf("%s", token);
+
+	printf("\tNúmero da linha: %d\n", line);
     exit(1);
 };
 
