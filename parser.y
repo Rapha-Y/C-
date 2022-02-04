@@ -17,13 +17,16 @@
 	char *str_val;
 }
 
-%token ELSE IF INT RETURN VOID WHILE
-%token ADD SUB MUL DIV
-%token LT LTE GT GTE EQ DIF
-%token ASSIGN SEMI COMMA 
-%token LPAR RPAR LBRACK RBRACK LBRACE RBRACE
+%token<int_val> ELSE IF INT RETURN VOID WHILE
+%token<int_val> ADD SUB MUL DIV
+%token<int_val> LT LTE GT GTE EQ DIF
+%token<int_val> ASSIGN SEMI COMMA 
+%token<int_val> LPAR RPAR LBRACK RBRACK LBRACE RBRACE
 %token<str_val> ID 
 %token<int_val> NUM
+
+%nonassoc ELSE_AUX
+%nonassoc ELSE
 
 %start program
 
@@ -198,7 +201,7 @@ expression-decl:
 ;
 
 selection-decl: 
-	if-decl {
+	if-decl %prec ELSE_AUX {
 		insert_syn_tree("selection-decl", 5);
 	} |
 	if-decl ELSE {
