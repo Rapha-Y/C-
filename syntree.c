@@ -9,9 +9,16 @@ void init_syn_tree() {
     syn_tree->root = NULL;
 }
 
-void insert_syn_tree(char *value, int child_num) {
+void insert_syn_tree(char *str_value, int int_value, int child_num, int line) {
     Syn_tree_node *new_node = (Syn_tree_node*)malloc(sizeof(Syn_tree_node));
-    new_node->value = value;
+    if(str_value == NULL) {
+        new_node->str_value = NULL;
+        new_node->int_value = int_value;
+    } else {
+        new_node->str_value = str_value;
+        new_node->int_value = 0;
+    }
+    new_node->child_num = child_num;
     new_node->next_sibling = NULL;
 
     // árvore vazia
@@ -39,8 +46,11 @@ void insert_syn_tree(char *value, int child_num) {
             // todos os nós no nível raíz viram filhos
             if(unchanged_sibling_num == 0) {
                 syn_tree->root = new_node;
-            } else {
+            } else if (unchanged_sibling_num > 0) {
                 node_to_change_siblings->next_sibling = new_node;
+            } else {
+                printf("Insertion error at line %d for %s or %d with child num %d\n", line, str_value, int_value, child_num);
+                exit(1);
             }
             syn_tree->root_sibling_total = syn_tree->root_sibling_total - child_num + 1;
         }
@@ -49,9 +59,14 @@ void insert_syn_tree(char *value, int child_num) {
 
 void print_subtree(Syn_tree_node *node, int tab_num) {
     for(int i = 0; i < tab_num; i++) {
-        printf("    ");
+        printf(" ");
     }
-    printf("%s\n", node->value);
+    if(node->str_value == NULL) {
+        printf("%d", node->int_value);
+    } else {
+        printf("%s", node->str_value);
+    }
+    printf(" (%d children)\n", node->child_num);
     
     if(node->first_child != NULL) {
         print_subtree(node->first_child, tab_num + 1);
