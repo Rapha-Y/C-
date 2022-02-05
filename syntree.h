@@ -13,4 +13,5 @@ typedef struct Syn_tree {
 
 void init_syn_tree();
 void insert_syn_tree(char *value, int int_value, int child_num, int line);
+void clean_tree();
 void print_tree();

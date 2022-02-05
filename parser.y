@@ -493,6 +493,7 @@ int main(int argc, char *argv[]) {
 	flag = yyparse();
 	fclose(yyin);
 
+	clean_tree();
 	print_tree();
 
 	return flag;

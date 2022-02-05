@@ -57,6 +57,40 @@ void insert_syn_tree(char *str_value, int int_value, int child_num, int line) {
     }
 }
 
+void clean_subtree(Syn_tree_node *node) {
+    if(node->first_child != NULL && node->first_child->str_value != NULL) {
+        char aux_str[64];
+        strcpy(aux_str, node->first_child->str_value);
+        if(strcmp(aux_str, "@") == 0) {
+            Syn_tree_node *node_to_delete = node->first_child;
+            node->first_child = node_to_delete->next_sibling;
+            free(node_to_delete);
+        }
+    }
+
+    if(node->next_sibling != NULL && node->next_sibling->str_value != NULL) {
+        char aux_str[64];
+        strcpy(aux_str, node->next_sibling->str_value);
+        if(strcmp(aux_str, "@") == 0) {
+            Syn_tree_node *node_to_delete = node->next_sibling;
+            node->next_sibling = node_to_delete->next_sibling;
+            free(node_to_delete);
+        }
+    }
+    
+    if(node->first_child != NULL) {
+        clean_subtree(node->first_child);
+    }
+
+    if(node->next_sibling != NULL) {
+        clean_subtree(node->next_sibling);
+    }
+}
+
+void clean_tree() {
+    clean_subtree(syn_tree->root);
+}
+
 void print_subtree(Syn_tree_node *node, int tab_num) {
     for(int i = 0; i < tab_num; i++) {
         printf(" ");
