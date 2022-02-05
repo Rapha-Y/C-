@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 #include "symtab.h"
 #define FILESIZE 216
@@ -38,21 +39,25 @@ static int generateHashCode(char* name, char* scope) {
     return aux;
 }
 
+bool isSameSymbol(char *name, char* itemName, char *scope, char *itemScope) {
+    return strcmp(name, itemName) == 0 && (strcmp(scope, itemScope) == 0);
+}
+
 void insertSymTab(int location, char *name, char *scope, char *typeData, int lineNum) {
     int hashCode = generateHashCode(name, scope);
     SymItem item = hashTable[hashCode];
 
-    while ((item != NULL) && (strcmp(name, item->name) != 0)) {
+    while ((item != NULL) && !isSameSymbol(name, item->name, scope, item->scope)) {
         item = item->next;
     } 
     
-    if (item == NULL || strcmp(scope, item->scope) != 0) { 
+    if (item == NULL || (strcmp(scope, item->scope) != 0)) { 
         SymItem newItem = (SymItem) malloc(sizeof(struct SymItem));
-        newItem->name = name;
         newItem->lines = (Line) malloc(sizeof(struct Line));
         newItem->lines->lineNum = lineNum;
-        newItem->memloc = location;
         newItem->lines->next = NULL;
+        newItem->name = name;
+        newItem->memloc = location;
         newItem->scope = scope;
         newItem->typeData = typeData;
         newItem->next = hashTable[hashCode];
@@ -62,20 +67,17 @@ void insertSymTab(int location, char *name, char *scope, char *typeData, int lin
         while (line->next != NULL) {
             line = line->next;
         }
-        line = (Line) malloc(sizeof(struct Line));
-        line->lineNum = lineNum;
-        line->next = NULL;
-        item->next = (SymItem) malloc(sizeof(struct SymItem));
-        item->next->lines = line;
-        item->next->next = NULL;  
+        line->next = (Line) malloc(sizeof(struct Line));
+        line->next->lineNum = lineNum;
+        line->next->next = NULL;  
     }
 }
 
 void printSymTab(FILE *listing) {
     int i;
     
-    fprintf(listing,"Localizacao        Nome          Escopo           Tipo        Linha    \n");
-    fprintf(listing,"-----------------------------------------------------------------------\n");
+    fprintf(listing,"Localizacao        Nome          Escopo           Tipo         Linha    \n");
+    fprintf(listing,"----------------------------------------------------------------------------\n");
     for (i=0; i<FILESIZE; i++) {
         if (hashTable[i] != NULL) {
             SymItem item = hashTable[i];
@@ -97,18 +99,14 @@ void printSymTab(FILE *listing) {
     }
 }
 
-// TODO : arrumar caso de símbolo com mesmo nome e escopo diferente, 
-// e caso de símbolo com mesmo nome e escopo que não deve ser inserido
+// int main(int argc, char *argv[]) {
+//     FILE *teste;
+//     teste  = fopen ("teste.txt", "w");
 
-/*int main(int argc, char *argv[]) {
-    FILE *teste;
-    teste  = fopen ("teste.txt", "w");
+//     insertSymTab(317, "testSymbol", "local", "int", 54);
+//     insertSymTab(218, "testSymbol", "global", "int", 31);
+//     insertSymTab(638, "outro", "global", "char", 11);
+//     insertSymTab(317, "testSymbol", "local", "int", 60);
 
-    insertSymTab(317, "testSymbol", "local", "int", 54);
-    insertSymTab(127, "another", "local", "char", 11);
-    // insertSymTab(218, "testSymbol", "global", "int", 31);
-    // insertSymTab(293, "testSymbol", "local", "int", 10);
-
-    printSymTab(teste);
-
-}*/
+//     printSymTab(teste);
+// }
