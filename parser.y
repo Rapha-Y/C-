@@ -17,13 +17,16 @@
 	char *str_val;
 }
 
-%token ELSE IF INT RETURN VOID WHILE
-%token ADD SUB MUL DIV
-%token LT LTE GT GTE EQ DIF
-%token ASSIGN SEMI COMMA 
-%token LPAR RPAR LBRACK RBRACK LBRACE RBRACE
+%token<int_val> ELSE IF INT RETURN VOID WHILE
+%token<int_val> ADD SUB MUL DIV
+%token<int_val> LT LTE GT GTE EQ DIF
+%token<int_val> ASSIGN SEMI COMMA 
+%token<int_val> LPAR RPAR LBRACK RBRACK LBRACE RBRACE
 %token<str_val> ID 
 %token<int_val> NUM
+
+%nonassoc ELSE_AUX
+%nonassoc ELSE
 
 %start program
 
@@ -31,378 +34,358 @@
 
 program: 
 	declaration-list { 
-		insert_syn_tree("program", 1);
+		insert_syn_tree("program", 0, 1, line);
 	}
 ;
 
 declaration-list: 
 	declaration-list declaration {
-		insert_syn_tree("declaration-list", 2);
+		insert_syn_tree("declaration-list", 0, 2, line);
 	} | 
 	declaration {
-		insert_syn_tree("declaration-list", 1);
+		insert_syn_tree("declaration-list", 0, 1, line);
 	}
 ;
 
 declaration: 
 	var-declaration {
-		insert_syn_tree("declaration", 1);
+		insert_syn_tree("declaration", 0, 1, line);
 	} | 
 	fun-declaration {
-		insert_syn_tree("declaration", 1);
+		insert_syn_tree("declaration", 0, 1, line);
 	}
 ;
 
 var-declaration: 
 	type-specifier ID SEMI {
-		char str1[64] = "ID(";
-		strcat(str1, $2);
-		strcat(str1, ")");
-		insert_syn_tree(str1, 0);
-		insert_syn_tree(";", 0);
-		insert_syn_tree("var-declaration", 3);
+		insert_syn_tree($2, 0, 0, line);
+		insert_syn_tree("ID", 0, 1, line);
+		insert_syn_tree(";", 0, 0, line);
+		insert_syn_tree("var-declaration", 0, 3, line);
 	} | 
 	type-specifier ID LBRACK NUM RBRACK SEMI {
-		char str1[64] = "ID(";
-		strcat(str1, $2);
-		strcat(str1, ")");
-		insert_syn_tree(str1, 0);
-		insert_syn_tree("[", 0);
-		char str3[15] = "NUM(";
-		char str4[10];
-		sprintf(str4, "%d", $4);
-		strcat(str3, str4);
-		strcat(str3, ")");
-		insert_syn_tree(str3, 0);
-		insert_syn_tree("]", 0);
-		insert_syn_tree(";", 0);
-		insert_syn_tree("var-declaration", 6);
+		insert_syn_tree($2, 0, 0, line);
+		insert_syn_tree("ID", 0, 1, line);
+		insert_syn_tree("[", 0, 0, line);
+		insert_syn_tree(NULL, $4, 0, line);
+		insert_syn_tree("NUM", 0, 1, line);
+		insert_syn_tree("]", 0, 0, line);
+		insert_syn_tree(";", 0, 0, line);
+		insert_syn_tree("var-declaration", 0, 6, line);
 	}
 ;
 
 type-specifier: 
 	INT {
-		insert_syn_tree("int", 0);
-		insert_syn_tree("type-specifier", 1);
+		insert_syn_tree("int", 0, 0, line);
+		insert_syn_tree("type-specifier", 0, 1, line);
 	} | 
 	VOID {
-		insert_syn_tree("void", 0);
-		insert_syn_tree("type-specifier", 1);
+		insert_syn_tree("void", 0, 0, line);
+		insert_syn_tree("type-specifier", 0, 1, line);
 	}
 ;
 
 fun-declaration: 
 	type-specifier ID LPAR {
-		char str1[64] = "ID(";
-		strcat(str1, $2);
-		strcat(str1, ")");
-		insert_syn_tree(str1, 0);
-		insert_syn_tree("(", 0);
+		insert_syn_tree($2, 0, 0, line);
+		insert_syn_tree("ID", 0, 1, line);
+		insert_syn_tree("LPAR", 0, 0, line);
 	} params RPAR {
-		insert_syn_tree(")", 0);
+		insert_syn_tree(")", 0, 0, line);
 	} composite-decl {
-		insert_syn_tree("fun-declaration", 6);
+		insert_syn_tree("fun-declaration", 0, 6, line);	
 	}
 ;
 
 params: 
 	param-list {
-		insert_syn_tree("params", 1);
+		insert_syn_tree("params", 0, 1, line);
 	} | 
 	VOID {
-		insert_syn_tree("void", 0);
-		insert_syn_tree("params", 1);
+		insert_syn_tree("void", 0, 0, line);
+		insert_syn_tree("params", 0, 1, line);
 	}
 ;
 
 param-list: 
 	param-list COMMA {
-		insert_syn_tree(",", 0);
+		insert_syn_tree(",", 0, 0, line);
 	} param {
-		insert_syn_tree("param-list", 3);
+		insert_syn_tree("param-list", 0, 3, line);
 	} | 
 	param {
-		insert_syn_tree("param-list", 1);
+		insert_syn_tree("param-list", 0, 1, line);
 	}
 ;
 
 param: 
 	type-specifier ID {
-		char str1[64] = "ID(";
-		strcat(str1, $2);
-		strcat(str1, ")");
-		insert_syn_tree(str1, 0);
-		insert_syn_tree("param", 2);
+		insert_syn_tree($2, 0, 0, line);
+		insert_syn_tree("ID", 0, 1, line);
+		insert_syn_tree("param", 0, 2, line);
 	} | 
 	type-specifier ID LBRACK RBRACK {
-		char str1[64] = "ID(";
-		strcat(str1, $2);
-		strcat(str1, ")");
-		insert_syn_tree(str1, 0);
-		insert_syn_tree("[", 0);
-		insert_syn_tree("]", 0);
-		insert_syn_tree("param", 4);
+		insert_syn_tree($2, 0, 0, line);
+		insert_syn_tree("ID", 0, 1, line);
+		insert_syn_tree("[", 0, 0, line);
+		insert_syn_tree("]", 0, 0, line);
+		insert_syn_tree("param", 0, 4, line);
 	}
 ;
 
 composite-decl: 
 	LBRACE {
-		insert_syn_tree("{", 0);
+		insert_syn_tree("{", 0, 0, line);
 	} local-declarations statement-list RBRACE {
-		insert_syn_tree("}", 0);
-		insert_syn_tree("composite-decl", 4);
+		insert_syn_tree("}", 0, 0, line);
+		insert_syn_tree("composite-decl", 0, 4, line);
 	}
 ;
 
 local-declarations: 
 	local-declarations var-declaration {
-		insert_syn_tree("local-declarations", 2);
+		insert_syn_tree("local-declarations", 0, 2, line);
 	} | 
-	/* empty */
+	/* empty */ {
+		insert_syn_tree("@", 0, 0, line);
+	}
 ;
 
 statement-list: 
 	statement-list statement {
-		insert_syn_tree("statement-list", 2);
+		insert_syn_tree("statement-list", 0, 2, line);
 	} | 
-	/* empty */
+	/* empty */ {
+		insert_syn_tree("@", 0, 0, line);
+	}
 ;
 
 statement: 
 	expression-decl {
-		insert_syn_tree("statement", 1);
+		insert_syn_tree("statement", 0, 1, line);
 	} | 
 	composite-decl {
-		insert_syn_tree("statement", 1);
+		insert_syn_tree("statement", 0, 1, line);
 	} | 
 	selection-decl {
-		insert_syn_tree("statement", 1);
+		insert_syn_tree("statement", 0, 1, line);
 	} | 
 	iteration-decl {
-		insert_syn_tree("statement", 1);
+		insert_syn_tree("statement", 0, 1, line);
 	} | 
 	return-decl {
-		insert_syn_tree("statement", 1);
+		insert_syn_tree("statement", 0, 1, line);
 	}
 ;
 
 expression-decl: 
 	expression SEMI {
-		insert_syn_tree(";", 0);
-		insert_syn_tree("expression-decl", 2);
+		insert_syn_tree(";", 0, 0, line);
+		insert_syn_tree("expression-decl", 0, 2, line);
 	} | 
 	SEMI {
-		insert_syn_tree(";", 0);
-		insert_syn_tree("expression-decl", 1);
+		insert_syn_tree(";", 0, 0, line);
+		insert_syn_tree("expression-decl", 0, 1, line);
 	}
 ;
 
 selection-decl: 
-	if-decl {
-		insert_syn_tree("selection-decl", 5);
+	if-decl %prec ELSE_AUX {
+		insert_syn_tree("selection-decl", 0, 5, line);
 	} |
 	if-decl ELSE {
-		insert_syn_tree("else", 0);
+		insert_syn_tree("else", 0, 0, line);
 	} statement {
-		insert_syn_tree("selection-decl", 7);
+		insert_syn_tree("selection-decl", 0, 7, line);
 	}
 ;
 
 // not shown
 if-decl:
 	IF LPAR {
-		insert_syn_tree("if", 0);
-		insert_syn_tree("(", 0);
+		insert_syn_tree("if", 0, 0, line);
+		insert_syn_tree("(", 0, 0, line);
 	} expression RPAR {
-		insert_syn_tree(")", 0);
+		insert_syn_tree(")", 0, 0, line);
 	} statement
 ;
 
 iteration-decl: 
 	WHILE LPAR {
-		insert_syn_tree("while", 0);
-		insert_syn_tree("(", 0);
+		insert_syn_tree("while", 0, 0, line);
+		insert_syn_tree("(", 0, 0, line);
 	} expression RPAR {
-		insert_syn_tree(")", 0);
+		insert_syn_tree(")", 0, 0, line);
 	} statement {
-		insert_syn_tree("iteration-decl", 5);
+		insert_syn_tree("iteration-decl", 0, 5, line);
 	}
 ;
 
 return-decl: 
 	RETURN SEMI {
-		insert_syn_tree("return", 0);
-		insert_syn_tree(";", 0);
-		insert_syn_tree("return-decl", 2);
+		insert_syn_tree("return", 0, 0, line);
+		insert_syn_tree(";", 0, 0, line);
+		insert_syn_tree("return-decl", 0, 2, line);
 	} | 
 	RETURN {
-		insert_syn_tree("return", 0);
+		insert_syn_tree("return", 0, 0, line);
 	} expression SEMI {
-		insert_syn_tree(";", 0);
-		insert_syn_tree("return-decl", 2);
+		insert_syn_tree(";", 0, 0, line);
+		insert_syn_tree("return-decl", 0, 2, line);
 	}
 ;
 
 expression: 
 	var ASSIGN {
-		insert_syn_tree("=", 0);
+		insert_syn_tree("=", 0, 0, line);
 	} expression {
-		insert_syn_tree("expression", 3);
+		insert_syn_tree("expression", 0, 3, line);
 	} | 
 	simple-expression {
-		insert_syn_tree("expression", 1);
+		insert_syn_tree("expression", 0, 1, line);
 	}
 ;
 
 var: 
 	ID {
-		char str1[64] = "ID(";
-		strcat(str1, $1);
-		strcat(str1, ")");
-		insert_syn_tree(str1, 0);
-		insert_syn_tree("var", 1);
+		insert_syn_tree($1, 0, 0, line);
+		insert_syn_tree("ID", 0, 1, line);
+		insert_syn_tree("var", 0, 1, line);
 	} | 
 	ID LBRACK {
-		char str1[64] = "ID(";
-		strcat(str1, $1);
-		strcat(str1, ")");
-		insert_syn_tree(str1, 0);
-		insert_syn_tree("[", 0);
+		insert_syn_tree($1, 0, 0, line);
+		insert_syn_tree("ID", 0, 1, line);
+		insert_syn_tree("[", 0, 0, line);
 	} expression RBRACK {
-		insert_syn_tree("]", 0);
-		insert_syn_tree("var", 4);
+		insert_syn_tree("]", 0, 0, line);
+		insert_syn_tree("var", 0, 4, line);
 	}
 ;
 
 simple-expression: 
 	sum-expression relational sum-expression {
-		insert_syn_tree("simple-expression", 3);
+		insert_syn_tree("simple-expression", 0, 3, line);
 	} | 
 	sum-expression {
-		insert_syn_tree("simple-expression", 1);
+		insert_syn_tree("simple-expression", 0, 1, line);
 	}
 ;
 
 relational: 
 	LTE {
-		insert_syn_tree("<=", 0);
-		insert_syn_tree("relational", 1);
+		insert_syn_tree("<=", 0, 0, line);
+		insert_syn_tree("relational", 0, 1, line);
 	} | 
 	LT {
-		insert_syn_tree("<", 0);
-		insert_syn_tree("relational", 1);
+		insert_syn_tree("<", 0, 0, line);
+		insert_syn_tree("relational", 0, 1, line);
 	} | 
 	GT {
-		insert_syn_tree(">", 0);
-		insert_syn_tree("relational", 1);
+		insert_syn_tree(">", 0, 0, line);
+		insert_syn_tree("relational", 0, 1, line);
 	} | 
 	GTE {
-		insert_syn_tree(">=", 0);
-		insert_syn_tree("relational", 1);
+		insert_syn_tree(">=", 0, 0, line);
+		insert_syn_tree("relational", 0, 1, line);
 	} | 
 	EQ {
-		insert_syn_tree("==", 0);
-		insert_syn_tree("relational", 1);
+		insert_syn_tree("==", 0, 0, line);
+		insert_syn_tree("relational", 0, 1, line);
 	} | 
 	DIF {
-		insert_syn_tree("!=", 0);
-		insert_syn_tree("relational", 1);
+		insert_syn_tree("!=", 0, 0, line);
+		insert_syn_tree("relational", 0, 1, line);
 	}
 ;
 
 sum-expression: 
 	sum-expression sum term {
-		insert_syn_tree("sum-expression", 3);
+		insert_syn_tree("sum-expression", 0, 3, line);
 	} | 
 	term {
-		insert_syn_tree("sum-expression", 1);
+		insert_syn_tree("sum-expression", 0, 1, line);
 	}
 ;
 
 sum: 
 	ADD {
-		insert_syn_tree("+", 0);
-		insert_syn_tree("sum", 1);
+		insert_syn_tree("+", 0, 0, line);
+		insert_syn_tree("sum", 0, 1, line);
 	} | 
 	SUB {
-		init_syn_tree("-", 0);
-		insert_syn_tree("sum", 1);
+		insert_syn_tree("-", 0, 0, line);
+		insert_syn_tree("sum", 0, 1, line);
 	}
 ;
 
 term: 
 	term mult factor {
-		insert_syn_tree("term", 3);
+		insert_syn_tree("term", 0, 3, line);
 	} | 
 	factor {
-		insert_syn_tree("term", 1);
+		insert_syn_tree("term", 0, 1, line);
 	}
 ;
 
 mult: 
 	MUL {
-		insert_syn_tree("*", 0);
-		insert_syn_tree("mult", 1);
+		insert_syn_tree("*", 0, 0, line);
+		insert_syn_tree("mult", 0, 1, line);
 	} | 
 	DIV {
-		insert_syn_tree("/", 0);
-		insert_syn_tree("mult", 1);
+		insert_syn_tree("/", 0, 0, line);
+		insert_syn_tree("mult", 0, 1, line);
 	}
 ;
 
 factor: 
 	LPAR {
-		insert_syn_tree("(", 0);
+		insert_syn_tree("(", 0, 0, line);
 	} expression RPAR {
-		insert_syn_tree(")", 0);
-		insert_syn_tree("factor", 3);
+		insert_syn_tree(")", 0, 0, line);
+		insert_syn_tree("factor", 0, 3, line);
 	} | 
 	var {
-		insert_syn_tree("factor", 1);
+		insert_syn_tree("factor", 0, 1, line);
 	} | 
 	activation {
-		insert_syn_tree("factor", 1);
+		insert_syn_tree("factor", 0, 1, line);
 	} | 
 	NUM {
-		char str3[15] = "NUM(";
-		char str4[10];
-		sprintf(str4, "%d", $1);
-		strcat(str3, str4);
-		strcat(str3, ")");
-		insert_syn_tree(str3, 0);
-		init_syn_tree("NUM", 0);
-		insert_syn_tree("factor", 1);
+		insert_syn_tree(NULL, $1, 0, line);
+		insert_syn_tree("NUM", 0, 1, line);
+		insert_syn_tree("factor", 0, 1, line);
 	}
 ;
 
 activation: 
 	ID LPAR {
-		char str1[64] = "ID(";
-		strcat(str1, $1);
-		strcat(str1, ")");
-		insert_syn_tree(str1, 0);
-		insert_syn_tree("(", 0);
+		insert_syn_tree($1, 0, 0, line);
+		insert_syn_tree("(", 0, 0, line);
 	} args RPAR {
-		insert_syn_tree(")", 0);
-		insert_syn_tree("activation", 4);
+		insert_syn_tree(")", 0, 0, line);
+		insert_syn_tree("activation", 0, 4, line);
 	}
 ;
 
 args: 
 	arg-list {
-		insert_syn_tree("args", 1);
+		insert_syn_tree("args", 0, 1, line);
 	} | 
-	/* empty */
+	/* empty */ {
+		insert_syn_tree("@", 0, 0, line);
+	}
 ;
 
 arg-list: 
 	arg-list COMMA {
-		insert_syn_tree(",", 0);
+		insert_syn_tree(",", 0, 0, line);
 	} expression {
-		insert_syn_tree("arg-list", 3);
+		insert_syn_tree("arg-list", 0, 3, line);
 	} | 
 	expression {
-		insert_syn_tree("arg-list", 1);
+		insert_syn_tree("arg-list", 0, 1, line);
 	}
 ;
 
@@ -510,6 +493,7 @@ int main(int argc, char *argv[]) {
 	flag = yyparse();
 	fclose(yyin);
 
+	clean_tree();
 	print_tree();
 
 	return flag;
