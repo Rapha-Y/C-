@@ -121,16 +121,10 @@ void updateNodeItemOnTable(Syn_tree_node *node, bool isFunction, char *scope) {
     }
 }
  
-void insertNodeOnTable(Syn_tree_node *node, bool isFunction, char *scope) {
+void insertNodeOnTable(Syn_tree_node *node, bool isFunction, char *scope, char *declarationType) {
     Syn_tree_node *child = node->first_child;
-    char *itemType = ""; char *itemName = ""; char *declarationType = "";
+    char *itemType = ""; char *itemName = ""; 
     int line; 
-
-    if (isFunction) {
-        declarationType = "function";
-    } else {
-        declarationType = "variable";
-    }
     
     while (child != NULL) {
         if (strcmp(child->str_value, "type-specifier") == 0 && child->child_num == 1) {
@@ -151,16 +145,18 @@ void insertNodeOnTable(Syn_tree_node *node, bool isFunction, char *scope) {
 
 void buildSymTabSubTree(Syn_tree_node *node, char *scope) {
     if (node != NULL && node->str_value != NULL) {
-        printf("Nó atual: %s\n", node->str_value);
+        //printf("Nó atual: %s\n", node->str_value);
 
         if (strcmp(node->str_value, "var-declaration") == 0) {
-            insertNodeOnTable(node, false, scope);
+            insertNodeOnTable(node, false, scope, "variable");
         } else if (strcmp(node->str_value, "var") == 0) {    
             updateNodeItemOnTable(node, false, scope);
         } else if (strcmp(node->str_value, "fun-declaration") == 0) {
-            insertNodeOnTable(node, true, scope);
+            insertNodeOnTable(node, true, scope, "function");
         } else if (strcmp(node->str_value, "activation") == 0) {
             updateNodeItemOnTable(node, true, scope);
+        } else if (strcmp(node->str_value, "param") == 0) {
+            insertNodeOnTable(node, false, scope, "parameter");
         } else {
             if (node->first_child != NULL) {
                 buildSymTabSubTree(node->first_child, scope);
