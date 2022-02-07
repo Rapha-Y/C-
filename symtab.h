@@ -1,16 +1,16 @@
-#ifndef _SYMTAB_H_
-#define _SYMTAB_H_
+typedef struct Line { 
+    int lineNum;
+    struct Line *next;
+} *Line;
 
-/* Inserts line numbers and memory locations into the symbol table
- * loc = memory location is inserted only the first time, otherwise ignored */
-void insertSymTab(int location, char *name, char *scope, char *typeData, int lineNum);
+typedef struct SymItem { 
+    Line lines;
+	char *name;
+    char *scope;
+    char *declarationType;
+	char *type; 
+    struct SymItem *next;
+} *SymItem;
 
-/* Returns the memory location of a variable */
-int lookupSymTab(char *name, char *scope );
-
-char* lookupTypeSymTab(char *name, char *scope);
-
-/* Prints a formatted listing of the symbol table contents to the listing file*/
+void buildSymTab(Syn_tree *tree);
 void printSymTab(FILE *listing);
-
-#endif

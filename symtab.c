@@ -6,20 +6,7 @@
 #define FILESIZE 216
 #define SHIFT 4
 
-typedef struct Line { 
-    int lineNum;
-    struct Line *next;
-} *Line;
-
-typedef struct SymItem { 
-    Line lines;
-    int memloc ; 
-	char *name;
-    char *scope;
-	char *typeData; 
-    struct SymItem *next;
-} *SymItem;
-
+void buildSymTabSubTree(Syn_tree_node *node, char *scope);
 static SymItem hashTable[FILESIZE];
 
 static int generateHashCode(char* name, char* scope) { 
@@ -43,7 +30,33 @@ bool isSameSymbol(char *name, char* itemName, char *scope, char *itemScope) {
     return strcmp(name, itemName) == 0 && (strcmp(scope, itemScope) == 0);
 }
 
-void insertSymTab(int location, char *name, char *scope, char *typeData, int lineNum) {
+void printSymTab(FILE *listing) {
+    int i;
+    
+    fprintf(listing," Nome          Escopo              Tipo                Linha    \n");
+    fprintf(listing,"--------------------------------------------------------------------\n");
+    for (i=0; i<FILESIZE; i++) {
+        if (hashTable[i] != NULL) {
+            SymItem item = hashTable[i];
+            while (item != NULL) {
+                fprintf(listing, "%-15s  ", item->name);
+		        fprintf(listing, "%-12s  ", item->scope);
+		        fprintf(listing, "%-8s  ", item->declarationType);	
+                fprintf(listing, "%-8s  ", item->type);
+
+                Line line = item->lines;
+                while (line != NULL) { 
+                    fprintf(listing, "%8d ", line->lineNum);
+                    line = line->next;
+                }
+                fprintf(listing, "\n");
+                item = item->next;
+            }
+        }
+    }
+}
+
+void insertSymTab(char *name, char *scope, char *dType, char *type, int lineNum) {
     int hashCode = generateHashCode(name, scope);
     SymItem item = hashTable[hashCode];
 
@@ -57,9 +70,9 @@ void insertSymTab(int location, char *name, char *scope, char *typeData, int lin
         newItem->lines->lineNum = lineNum;
         newItem->lines->next = NULL;
         newItem->name = name;
-        newItem->memloc = location;
         newItem->scope = scope;
-        newItem->typeData = typeData;
+        newItem->declarationType = dType;
+        newItem->type = type;
         newItem->next = hashTable[hashCode];
         hashTable[hashCode] = newItem; 
     } else {
@@ -73,40 +86,51 @@ void insertSymTab(int location, char *name, char *scope, char *typeData, int lin
     }
 }
 
-void printSymTab(FILE *listing) {
-    int i;
+void insertNodeOnTable(Syn_tree_node *node, bool isFunction, char *scope) {
+    Syn_tree_node *child = node->first_child;
+    char *itemType = "-"; char *itemName = "-"; char *declarationType = "-"; 
+
+    if (isFunction) {
+        declarationType = "function";
+    } else {
+        declarationType = "variable";
+    }
     
-    fprintf(listing,"Localizacao        Nome          Escopo           Tipo         Linha    \n");
-    fprintf(listing,"----------------------------------------------------------------------------\n");
-    for (i=0; i<FILESIZE; i++) {
-        if (hashTable[i] != NULL) {
-            SymItem item = hashTable[i];
-            while (item != NULL) {
-                fprintf(listing, "%-15d ", item->memloc);
-                fprintf(listing, "%-15s  ", item->name);
-		        fprintf(listing, "%-15s  ", item->scope);
-		        fprintf(listing, "%-10s  ", item->typeData);	
-                
-                Line line = item->lines;
-                while (line != NULL) { 
-                    fprintf(listing, "%4d ", line->lineNum);
-                    line = line->next;
-                }
-                fprintf(listing, "\n");
-                item = item->next;
+    while (child != NULL) {
+        if (strcmp(child->str_value, "type-specifier") == 0 && child->child_num == 1) {
+            itemType = child->first_child->str_value;
+        }
+        if (strcmp(child->str_value, "ID") == 0 && child->child_num == 1) {
+            itemName = child->first_child->str_value;
+        }
+        child = child->next_sibling;
+    }
+    insertSymTab(itemName, scope, declarationType, itemType, node->line);
+    
+    if (isFunction) {
+        buildSymTabSubTree(node->first_child, itemName);
+    }
+}
+
+void buildSymTabSubTree(Syn_tree_node *node, char *scope) {
+    if (node != NULL && node->str_value != NULL) {
+        printf("Nó atual: %s\n", node->str_value);
+
+        if (strcmp(node->str_value, "var-declaration") == 0) {
+            insertNodeOnTable(node, false, scope);
+        } else if (strcmp(node->str_value, "fun-declaration") == 0) {
+            insertNodeOnTable(node, true, scope);
+        } else {
+            if (node->first_child != NULL) {
+                buildSymTabSubTree(node->first_child, scope);
+            }
+            if (node->next_sibling != NULL) {
+                buildSymTabSubTree(node->next_sibling, scope);
             }
         }
     }
 }
 
-// int main(int argc, char *argv[]) {
-//     FILE *teste;
-//     teste  = fopen ("teste.txt", "w");
-
-//     insertSymTab(317, "testSymbol", "local", "int", 54);
-//     insertSymTab(218, "testSymbol", "global", "int", 31);
-//     insertSymTab(638, "outro", "global", "char", 11);
-//     insertSymTab(317, "testSymbol", "local", "int", 60);
-
-//     printSymTab(teste);
-// }
+void buildSymTab(Syn_tree *tree) {
+    buildSymTabSubTree(tree->root, "global");
+}

@@ -4,6 +4,10 @@
 
 Syn_tree *syn_tree;
 
+Syn_tree * getTree() {
+    return syn_tree;
+}
+
 void init_syn_tree() {
     syn_tree = (Syn_tree*)malloc(sizeof(Syn_tree));
     syn_tree->root = NULL;
@@ -14,9 +18,11 @@ void insert_syn_tree(char *str_value, int int_value, int child_num, int line) {
     if(str_value == NULL) {
         new_node->str_value = NULL;
         new_node->int_value = int_value;
+        new_node->line = line;
     } else {
         new_node->str_value = str_value;
         new_node->int_value = 0;
+        new_node->line = line;
     }
     new_node->child_num = child_num;
     new_node->next_sibling = NULL;

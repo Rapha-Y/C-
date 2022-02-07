@@ -3,6 +3,7 @@
 	#include <stdlib.h>
 	#include <string.h>
 	#include "syntree.c"
+	#include "symtab.c"
 
 	extern FILE *yyin;
 	extern FILE *yyout;
@@ -494,7 +495,15 @@ int main(int argc, char *argv[]) {
 	fclose(yyin);
 
 	clean_tree();
-	print_tree();
+	//print_tree();
+
+	Syn_tree *tree = getTree();
+    buildSymTab(tree);
+
+    FILE *teste;
+    teste  = fopen ("teste.txt", "w");
+    printSymTab(teste);
+	fclose(teste);
 
 	return flag;
 }
