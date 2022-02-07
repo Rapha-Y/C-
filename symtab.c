@@ -148,11 +148,11 @@ void buildSymTabSubTree(Syn_tree_node *node, char *scope) {
         //printf("Nó atual: %s\n", node->str_value);
 
         if (strcmp(node->str_value, "var-declaration") == 0) {
-            insertNodeOnTable(node, false, scope, "variable");
+            insertNodeOnTable(node, false, scope, "variable ");
         } else if (strcmp(node->str_value, "var") == 0) {    
             updateNodeItemOnTable(node, false, scope);
         } else if (strcmp(node->str_value, "fun-declaration") == 0) {
-            insertNodeOnTable(node, true, scope, "function");
+            insertNodeOnTable(node, true, scope, "function ");
         } else if (strcmp(node->str_value, "activation") == 0) {
             updateNodeItemOnTable(node, true, scope);
         } else if (strcmp(node->str_value, "param") == 0) {
