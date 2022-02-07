@@ -39,14 +39,14 @@ void printSymTab(FILE *listing) {
         if (hashTable[i] != NULL) {
             SymItem item = hashTable[i];
             while (item != NULL) {
-                fprintf(listing, "%-15s  ", item->name);
+                fprintf(listing, "%-12s  ", item->name);
 		        fprintf(listing, "%-12s  ", item->scope);
 		        fprintf(listing, "%-8s  ", item->declarationType);	
                 fprintf(listing, "%-8s  ", item->type);
 
                 Line line = item->lines;
                 while (line != NULL) { 
-                    fprintf(listing, "%5d ", line->lineNum);
+                    fprintf(listing, "%3d ", line->lineNum);
                     line = line->next;
                 }
                 fprintf(listing, "\n");
@@ -92,12 +92,14 @@ void insertSymTab(char *name, char *scope, char *dType, char *type, int lineNum)
 
 void updateNodeItemOnTable(Syn_tree_node *node, bool isFunction, char *scope) {
     char *itemName = "";
+    Syn_tree_node *child = node->first_child;
+    
     if (isFunction) {
-        itemName = node->first_child->str_value;
-    } else {
-        Syn_tree_node *child = node->first_child;
-        itemName = child->first_child->str_value; // get var ID value
+        itemName = child->str_value;
+    } else if (strcmp(child->str_value, "ID") == 0) {
+        itemName = child->first_child->str_value;
     }
+    //printf("Update item line: %s\n", itemName);
 
     int hashCode = generateHashCode(itemName, scope);
     SymItem item = hashTable[hashCode];
@@ -106,6 +108,12 @@ void updateNodeItemOnTable(Syn_tree_node *node, bool isFunction, char *scope) {
         updateLineOnItem(item, node->line);
     }
 
+    if (node->first_child != NULL) {
+        buildSymTabSubTree(node->first_child, scope);
+    }
+    if (node->next_sibling != NULL) {
+        buildSymTabSubTree(node->next_sibling, scope);
+    }
 }
  
 void insertNodeOnTable(Syn_tree_node *node, bool isFunction, char *scope) {
@@ -140,7 +148,7 @@ void buildSymTabSubTree(Syn_tree_node *node, char *scope) {
 
         if (strcmp(node->str_value, "var-declaration") == 0) {
             insertNodeOnTable(node, false, scope);
-        } else if (strcmp(node->str_value, "var") == 0) {
+        } else if (strcmp(node->str_value, "var") == 0) {    
             updateNodeItemOnTable(node, false, scope);
         } else if (strcmp(node->str_value, "fun-declaration") == 0) {
             insertNodeOnTable(node, true, scope);
