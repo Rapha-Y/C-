@@ -46,7 +46,7 @@ void printSymTab(FILE *listing) {
 
                 Line line = item->lines;
                 while (line != NULL) { 
-                    fprintf(listing, "%8d ", line->lineNum);
+                    fprintf(listing, "%5d ", line->lineNum);
                     line = line->next;
                 }
                 fprintf(listing, "\n");
@@ -54,6 +54,16 @@ void printSymTab(FILE *listing) {
             }
         }
     }
+}
+
+void updateLineOnItem(SymItem item, int lineNum) {
+    Line line = item->lines;
+    while (line->next != NULL) {
+        line = line->next;
+    }
+    line->next = (Line) malloc(sizeof(struct Line));
+    line->next->lineNum = lineNum;
+    line->next->next = NULL;          
 }
 
 void insertSymTab(char *name, char *scope, char *dType, char *type, int lineNum) {
@@ -76,19 +86,31 @@ void insertSymTab(char *name, char *scope, char *dType, char *type, int lineNum)
         newItem->next = hashTable[hashCode];
         hashTable[hashCode] = newItem; 
     } else {
-        Line line = item->lines;
-        while (line->next != NULL) {
-            line = line->next;
-        }
-        line->next = (Line) malloc(sizeof(struct Line));
-        line->next->lineNum = lineNum;
-        line->next->next = NULL;  
+        updateLineOnItem(item, lineNum);
     }
 }
 
+void updateNodeItemOnTable(Syn_tree_node *node, bool isFunction, char *scope) {
+    char *itemName = "";
+    if (isFunction) {
+        itemName = node->first_child->str_value;
+    } else {
+        Syn_tree_node *child = node->first_child;
+        itemName = child->first_child->str_value; // get var ID value
+    }
+
+    int hashCode = generateHashCode(itemName, scope);
+    SymItem item = hashTable[hashCode];
+
+    if (item != NULL) {
+        updateLineOnItem(item, node->line);
+    }
+
+}
+ 
 void insertNodeOnTable(Syn_tree_node *node, bool isFunction, char *scope) {
     Syn_tree_node *child = node->first_child;
-    char *itemType = "-"; char *itemName = "-"; char *declarationType = "-"; 
+    char *itemType = ""; char *itemName = ""; char *declarationType = ""; 
 
     if (isFunction) {
         declarationType = "function";
@@ -114,12 +136,16 @@ void insertNodeOnTable(Syn_tree_node *node, bool isFunction, char *scope) {
 
 void buildSymTabSubTree(Syn_tree_node *node, char *scope) {
     if (node != NULL && node->str_value != NULL) {
-        printf("Nó atual: %s\n", node->str_value);
+        // printf("Nó atual: %s\n", node->str_value);
 
         if (strcmp(node->str_value, "var-declaration") == 0) {
             insertNodeOnTable(node, false, scope);
+        } else if (strcmp(node->str_value, "var") == 0) {
+            updateNodeItemOnTable(node, false, scope);
         } else if (strcmp(node->str_value, "fun-declaration") == 0) {
             insertNodeOnTable(node, true, scope);
+        } else if (strcmp(node->str_value, "activation") == 0) {
+            updateNodeItemOnTable(node, true, scope);
         } else {
             if (node->first_child != NULL) {
                 buildSymTabSubTree(node->first_child, scope);

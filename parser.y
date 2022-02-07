@@ -495,7 +495,7 @@ int main(int argc, char *argv[]) {
 	fclose(yyin);
 
 	clean_tree();
-	//print_tree();
+	print_tree();
 
 	Syn_tree *tree = getTree();
     buildSymTab(tree);
