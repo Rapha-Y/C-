@@ -91,21 +91,26 @@ void insertSymTab(char *name, char *scope, char *dType, char *type, int lineNum)
 }
 
 void updateNodeItemOnTable(Syn_tree_node *node, bool isFunction, char *scope) {
-    char *itemName = "";
+    char *itemName = ""; 
+    char *itemScope = scope; 
+    int line;
     Syn_tree_node *child = node->first_child;
     
     if (isFunction) {
         itemName = child->str_value;
+        line = child->line;
+        itemScope = "global";
     } else if (strcmp(child->str_value, "ID") == 0) {
         itemName = child->first_child->str_value;
+        line = child->first_child->line;
     }
     //printf("Update item line: %s\n", itemName);
 
-    int hashCode = generateHashCode(itemName, scope);
+    int hashCode = generateHashCode(itemName, itemScope);
     SymItem item = hashTable[hashCode];
 
     if (item != NULL) {
-        updateLineOnItem(item, node->line);
+        updateLineOnItem(item, line);
     }
 
     if (node->first_child != NULL) {
@@ -118,7 +123,8 @@ void updateNodeItemOnTable(Syn_tree_node *node, bool isFunction, char *scope) {
  
 void insertNodeOnTable(Syn_tree_node *node, bool isFunction, char *scope) {
     Syn_tree_node *child = node->first_child;
-    char *itemType = ""; char *itemName = ""; char *declarationType = ""; 
+    char *itemType = ""; char *itemName = ""; char *declarationType = "";
+    int line; 
 
     if (isFunction) {
         declarationType = "function";
@@ -132,10 +138,11 @@ void insertNodeOnTable(Syn_tree_node *node, bool isFunction, char *scope) {
         }
         if (strcmp(child->str_value, "ID") == 0 && child->child_num == 1) {
             itemName = child->first_child->str_value;
+            line = child->first_child->line;
         }
         child = child->next_sibling;
     }
-    insertSymTab(itemName, scope, declarationType, itemType, node->line);
+    insertSymTab(itemName, scope, declarationType, itemType, line);
     
     if (isFunction) {
         buildSymTabSubTree(node->first_child, itemName);
@@ -144,7 +151,7 @@ void insertNodeOnTable(Syn_tree_node *node, bool isFunction, char *scope) {
 
 void buildSymTabSubTree(Syn_tree_node *node, char *scope) {
     if (node != NULL && node->str_value != NULL) {
-        // printf("Nó atual: %s\n", node->str_value);
+        printf("Nó atual: %s\n", node->str_value);
 
         if (strcmp(node->str_value, "var-declaration") == 0) {
             insertNodeOnTable(node, false, scope);
