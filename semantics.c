@@ -51,8 +51,8 @@ bool isSameItem(char *name, char *iName, char *scope, char *iScope, char *dType,
     return (strcmp(name, iName) == 0) && (strcmp(scope, iScope) == 0) && (strcmp(dType, iDType) == 0);
 }
 
-bool hasItemInDeclarationList(SymItem *declarations, Syn_tree_node *node, char *declarationType, char *scope) {
-    SymItem *lastItem = declarations;
+bool hasItemInDeclarationList(SymItem declarations, Syn_tree_node *node, char *declarationType, char *scope) {
+    SymItem lastItem = declarations;
     char *name = findItemFieldByLabel("ID", node);
 
     while (lastItem != NULL || !isSameItem(name, lastItem->name, scope, lastItem->scope, declarationType, lastItem->declarationType)) {
@@ -62,15 +62,15 @@ bool hasItemInDeclarationList(SymItem *declarations, Syn_tree_node *node, char *
     return lastItem != NULL;
 }
 
-void addNewItem(SymItem *declarations, Syn_tree_node *node, char *declarationType, char *scope) {
-    SymItem *lastItem = declarations;
+void addNewItem(SymItem declarations, Syn_tree_node *node, char *declarationType, char *scope) {
+    SymItem lastItem = declarations;
     char *name = findItemFieldByLabel("ID", node);
 
     while (lastItem != NULL) {
         lastItem = lastItem->next;
     }
 
-    SymItem *newItem = (SymItem *) malloc(sizeof(struct SymItem));
+    SymItem newItem = (SymItem) malloc(sizeof(struct SymItem));
     newItem->name = name;
     newItem->declarationType = declarationType;
     newItem->scope = scope;
@@ -78,7 +78,7 @@ void addNewItem(SymItem *declarations, Syn_tree_node *node, char *declarationTyp
     lastItem = newItem;
 }
 
-int decl_before_use_runner(Syn_tree_node *node, char *scope, SymItem *declarations) {
+int decl_before_use_runner(Syn_tree_node *node, char *scope, SymItem declarations) {
     if (strcmp(node->str_value, "fun-declaration") == 0) {
         addNewItem(declarations, node, "function", scope);
         scope = findItemFieldByLabel("ID", node);
@@ -110,7 +110,7 @@ int decl_before_use_runner(Syn_tree_node *node, char *scope, SymItem *declaratio
 }
 
 int decl_before_use(Syn_tree *tree) {
-    SymItem *declarations;
+    SymItem declarations;
     return decl_before_use_runner(tree->root, "global", declarations);
 }
 
