@@ -2,7 +2,7 @@ void semantic_check(Syn_tree *tree);
 int decl_before_use(Syn_tree *tree); //difficult - vars/funs must be declared first
 int last_decl_main(Syn_tree *tree); //done - last decl is void main
 int void_for_fun(Syn_tree *tree); //done - void is a type exclusive to functions
-int if_int_cond(Syn_tree *tree); //difficult - if condition has to end in an int
+int if_int_cond(Syn_tree *tree); //kinda done, requires arr and ret cases - if condition has to end in an int
 int while_int_cond(Syn_tree *tree); //difficult - same as above
 int fun_ret_val(Syn_tree *tree); //difficult - int functions must return int, void mustn't return anything
 int arr_int_brack(Syn_tree *tree); //difficult - expressions inside brackets must end in int
