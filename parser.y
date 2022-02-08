@@ -227,13 +227,13 @@ return-decl:
 	RETURN SEMI {
 		insert_syn_tree("return", 0, 0, line);
 		insert_syn_tree(";", 0, 0, line);
-		insert_syn_tree("return-decl", 0, 2, line);
+		insert_syn_tree("return-decl", 0, 3, line);
 	} | 
 	RETURN {
 		insert_syn_tree("return", 0, 0, line);
 	} expression SEMI {
 		insert_syn_tree(";", 0, 0, line);
-		insert_syn_tree("return-decl", 0, 2, line);
+		insert_syn_tree("return-decl", 0, 3, line);
 	}
 ;
 
@@ -363,6 +363,7 @@ factor:
 activation: 
 	ID LPAR {
 		insert_syn_tree($1, 0, 0, line);
+		insert_syn_tree("ID", 0, 1, line);
 		insert_syn_tree("(", 0, 0, line);
 	} args RPAR {
 		insert_syn_tree(")", 0, 0, line);
