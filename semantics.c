@@ -9,7 +9,8 @@ void semantic_check(Syn_tree *tree) {
         (last_decl_main(tree) != 0) && 
         (void_for_fun(tree) != 0) && 
         (if_int_cond(tree) != 0) &&
-        (while_int_cond(tree) != 0)
+        (while_int_cond(tree) != 0) &&
+        (arr_int_brack(tree) != 0)
     ) {
         exit(1);
     }
@@ -231,4 +232,41 @@ int while_int_cond_runner(Syn_tree_node *node) {
 
 int while_int_cond(Syn_tree *tree) {
     return while_int_cond_runner(tree->root);
+}
+
+int arr_int_brack_runner(Syn_tree_node *node) {
+    if(node->str_value && (strcmp(node->str_value, "var") == 0)) {
+        Syn_tree_node *first_child = node->first_child;
+        Syn_tree_node *last_child = node->first_child;
+
+        while(last_child->next_sibling != NULL) {
+            last_child = last_child->next_sibling;
+        }
+
+        if(first_child == last_child) {
+            return 1;
+        }
+
+        int ret_val = exp_rets_int(first_child->next_sibling->next_sibling);
+        if(ret_val == 0) {
+            printf("ERRO SEMÂNTICO: ÍNDICE DE ARRAY NÃO RETORNA VALOR INTEIRO\n");
+        }
+        return ret_val;
+    }
+
+    int in_first_child = 1;
+    int in_next_sibling = 1;
+
+    if(node->first_child != NULL) {
+        in_first_child = arr_int_brack_runner(node->first_child);
+    }
+    if(node->next_sibling != NULL) {
+        in_next_sibling = arr_int_brack_runner(node->next_sibling);
+    }
+
+    return (in_first_child && in_next_sibling);
+}
+
+int arr_int_brack(Syn_tree *tree) {
+    return arr_int_brack_runner(tree->root);
 }
