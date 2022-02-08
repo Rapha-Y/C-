@@ -5,7 +5,12 @@ int exp_rets_int(Syn_tree_node *node);
 //remember to group errors, add lines and ids
 void semantic_check(Syn_tree *tree) {
     int line;
-    if((last_decl_main(tree) != 0) && (void_for_fun(tree) != 0) && (if_int_cond(tree) != 0)) {
+    if(
+        (last_decl_main(tree) != 0) && 
+        (void_for_fun(tree) != 0) && 
+        (if_int_cond(tree) != 0) &&
+        (while_int_cond(tree) != 0)
+    ) {
         exit(1);
     }
 }
@@ -200,4 +205,30 @@ int if_int_cond_runner(Syn_tree_node *node) {
 
 int if_int_cond(Syn_tree *tree) {
     return if_int_cond_runner(tree->root);
+}
+
+int while_int_cond_runner(Syn_tree_node *node) {
+    if(node->str_value && (strcmp(node->str_value, "iteration-decl") == 0)) {
+        int ret_val = exp_rets_int(node->first_child->next_sibling->next_sibling);
+        if(ret_val == 0) {
+            printf("ERRO SEMÂNTICO: CONDIÇÃO DE WHILE NÃO RETORNA VALOR INTEIRO\n");
+        }
+        return ret_val;
+    }
+
+    int in_first_child = 1;
+    int in_next_sibling = 1;
+
+    if(node->first_child != NULL) {
+        in_first_child = while_int_cond_runner(node->first_child);
+    }
+    if(node->next_sibling != NULL) {
+        in_next_sibling = while_int_cond_runner(node->next_sibling);
+    }
+
+    return (in_first_child && in_next_sibling);
+}
+
+int while_int_cond(Syn_tree *tree) {
+    return while_int_cond_runner(tree->root);
 }
