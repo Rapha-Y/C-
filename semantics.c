@@ -6,7 +6,7 @@
 //remember to group errors, add lines and ids
 void semantic_check(Syn_tree *tree) {
     int line;
-    if((last_decl_main(tree) != 0) && (void_for_fun(tree) != 0)) {
+    if((last_decl_main(tree) != 0) && (void_for_fun(tree) != 0) && decl_before_use(tree) != 0) {
         exit(1);
     }
 }
@@ -96,10 +96,10 @@ int decl_before_use_runner(Syn_tree_node *node, char *scope, SymItem declaration
         }
     }
 
-    int in_first_child = 0;
-    int in_next_sibling = 0;
+    int in_first_child = 1;
+    int in_next_sibling = 1;
 
-    if((node->first_child != NULL) && (node->next_sibling->str_value != NULL)) {
+    if((node->first_child != NULL) && (node->first_child->str_value != NULL)) {
         in_first_child = decl_before_use_runner(node->first_child, scope, declarations);
     }
     if((node->next_sibling != NULL) && (node->next_sibling->str_value != NULL)) {
