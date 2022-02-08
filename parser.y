@@ -233,7 +233,7 @@ return-decl:
 		insert_syn_tree("return", 0, 0, line);
 	} expression SEMI {
 		insert_syn_tree(";", 0, 0, line);
-		insert_syn_tree("return-decl", 0, 2, line);
+		insert_syn_tree("return-decl", 0, 3, line);
 	}
 ;
 
