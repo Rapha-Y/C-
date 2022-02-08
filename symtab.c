@@ -4,6 +4,7 @@
 #include <string.h>
 #include "symtab.h"
 #define FILESIZE 216
+#define MAXSTRING 216
 #define SHIFT 4
 
 void buildSymTabSubTree(Syn_tree_node *node, char *scope);
@@ -11,18 +12,17 @@ static SymItem hashTable[FILESIZE];
 
 static int generateHashCode(char* name, char* scope) { 
     int aux = 0; int i = 0;
+    char hashString[MAXSTRING] = "";
     
-    while (name[i] != '\0') { 
-        aux = ((aux << SHIFT) + name[i]) % FILESIZE;
+    strcat(hashString, scope);
+    strcat(hashString, "-");
+    strcat(hashString, name);
+    
+    while (hashString[i] != '\0') {
+        aux = ((aux << SHIFT) + hashString[i]) % FILESIZE;
         i++;
     }
-    i = 0;
-    
-    while (scope[i] != '\0') { 
-        aux = ((aux << SHIFT) + scope[i]) % FILESIZE;
-        i++;
-    }
-    
+
     return aux;
 }
 
@@ -97,18 +97,16 @@ void updateNodeItemOnTable(Syn_tree_node *node, bool isFunction, char *scope) {
     Syn_tree_node *child = node->first_child;
     
     if (isFunction) {
-        itemName = child->str_value;
-        line = child->line;
         itemScope = "global";
-    } else if (strcmp(child->str_value, "ID") == 0) {
+    } 
+    if (strcmp(child->str_value, "ID") == 0) {
         itemName = child->first_child->str_value;
         line = child->first_child->line;
     }
-    //printf("Update item line: %s\n", itemName);
 
     int hashCode = generateHashCode(itemName, itemScope);
     SymItem item = hashTable[hashCode];
-
+    
     if (item != NULL) {
         updateLineOnItem(item, line);
     }
@@ -145,7 +143,7 @@ void insertNodeOnTable(Syn_tree_node *node, bool isFunction, char *scope, char *
 
 void buildSymTabSubTree(Syn_tree_node *node, char *scope) {
     if (node != NULL && node->str_value != NULL) {
-        //printf("Nó atual: %s\n", node->str_value);
+        // printf("Nó atual: %s\n", node->str_value);
 
         if (strcmp(node->str_value, "var-declaration") == 0) {
             insertNodeOnTable(node, false, scope, "variable ");
