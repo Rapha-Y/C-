@@ -4,6 +4,7 @@
 	#include <string.h>
 	#include "syntree.c"
 	#include "symtab.c"
+	#include "semantics.c"
 
 	extern FILE *yyin;
 	extern FILE *yyout;
@@ -505,6 +506,8 @@ int main(int argc, char *argv[]) {
     teste  = fopen ("teste.txt", "w");
     printSymTab(teste);
 	fclose(teste);
+
+	semantic_check(tree);
 
 	return flag;
 }
