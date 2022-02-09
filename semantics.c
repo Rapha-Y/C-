@@ -3,10 +3,9 @@
 #include <stdbool.h>
 #include "semantics.h"
 
-//remember to group errors, add lines and ids
 void semantic_check(Syn_tree *tree) {
     int line;
-    if((last_decl_main(tree) != 0) && (void_for_fun(tree) != 0) && decl_before_use(tree) != 0) {
+    if((last_decl_main(tree) != 0) && (void_for_fun(tree) != 0)) {
         exit(1);
     }
 }
